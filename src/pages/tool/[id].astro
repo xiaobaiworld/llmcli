@@ -1,0 +1,161 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import {
+  getTools,
+  CATEGORY_LABELS,
+  CATEGORY_COLORS,
+  KIND_LABELS,
+  LEVEL_BG,
+  LEVEL_DOT,
+} from '../../lib/tools';
+import type { Tool } from '../../lib/tools';
+
+export async function getStaticPaths() {
+  const tools = getTools();
+  return tools.map(tool => ({
+    params: { id: tool.id },
+    props: { tool },
+  }));
+}
+
+interface Props {
+  tool: Tool;
+}
+const { tool } = Astro.props;
+
+const scoreArray = Array.from({ length: 5 }, (_, i) => i < tool.agent_ready_score);
+const dotColor = LEVEL_DOT[tool.agent_ready_level];
+
+// Generate likely install commands
+const installCommands: Record<string, string> = {
+  brew: `brew install ${tool.command}`,
+  apt: `sudo apt install ${tool.command}`,
+  npm: `npm install -g ${tool.command}`,
+  pip: `pip install ${tool.command}`,
+  cargo: `cargo install ${tool.command}`,
+  go: `go install ${tool.command}@latest`,
+  system: `# pre-installed on most systems`,
+  binary: `# download binary from project releases`,
+  docker: `docker pull ${tool.command}`,
+};
+
+const maintainedLabel = {
+  yes: '✓ Actively maintained',
+  unknown: '? Unknown',
+  no: '✗ Not maintained',
+} as const;
+---
+
+<BaseLayout
+  title={`${tool.name} — llmcli`}
+  description={tool.notes ?? `${tool.name} (${tool.command}) — CLI tool rated for AI agent use.`}
+>
+  <div class="max-w-3xl mx-auto px-4 py-10" data-pagefind-body>
+    <!-- Breadcrumb -->
+    <a href="/" class="text-sm text-gray-400 hover:text-gray-600 inline-flex items-center gap-1 mb-8">
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+      </svg>
+      All tools
+    </a>
+
+    <!-- Header -->
+    <div class="mb-8">
+      <div class="flex items-start justify-between gap-4 flex-wrap mb-4">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900" data-pagefind-meta="title">{tool.name}</h1>
+          <code class="text-sm bg-gray-900 text-green-400 px-3 py-1 rounded font-mono mt-2 inline-block">
+            {tool.command}
+          </code>
+        </div>
+        <span class={`text-sm font-semibold px-3 py-1.5 rounded-full ${LEVEL_BG[tool.agent_ready_level]}`}>
+          Agent Ready: {tool.agent_ready_level.toUpperCase()}
+        </span>
+      </div>
+
+      {tool.notes && (
+        <p class="text-gray-600 text-base leading-relaxed" data-pagefind-meta="description">
+          {tool.notes}
+        </p>
+      )}
+    </div>
+
+    <!-- Agent-ready score card -->
+    <div class="bg-gray-50 border border-gray-200 rounded-lg p-5 mb-6">
+      <h2 class="text-sm font-semibold text-gray-700 mb-3">Agent-Ready Score</h2>
+      <div class="flex items-center gap-2 mb-3">
+        {scoreArray.map(filled => (
+          <svg class={`w-5 h-5 ${filled ? dotColor : 'fill-gray-200'}`} viewBox="0 0 8 8">
+            <circle cx="4" cy="4" r="4" />
+          </svg>
+        ))}
+        <span class="font-bold text-gray-900 text-lg ml-1">{tool.agent_ready_score}<span class="text-gray-400 font-normal text-sm">/5</span></span>
+      </div>
+      <p class="text-xs text-gray-500 leading-relaxed">
+        Scored on: non-interactive mode available, machine-readable output (JSON/plain text),
+        predictable exit codes, no interactive auth prompts.
+      </p>
+    </div>
+
+    <!-- Details -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8">
+      <div class="bg-gray-50 rounded-lg p-3">
+        <p class="text-xs text-gray-400 mb-1.5">Category</p>
+        <span class={`text-xs px-2 py-0.5 rounded-full font-medium ${CATEGORY_COLORS[tool.category]}`}>
+          {CATEGORY_LABELS[tool.category]}
+        </span>
+      </div>
+      <div class="bg-gray-50 rounded-lg p-3">
+        <p class="text-xs text-gray-400 mb-1.5">Kind</p>
+        <p class="text-sm font-medium text-gray-900">{KIND_LABELS[tool.kind] ?? tool.kind}</p>
+      </div>
+      <div class="bg-gray-50 rounded-lg p-3">
+        <p class="text-xs text-gray-400 mb-1.5">Priority</p>
+        <p class="text-sm font-medium text-gray-900">{tool.priority === 'A' ? '⭐ Priority A' : 'Priority B'}</p>
+      </div>
+      <div class="bg-gray-50 rounded-lg p-3 col-span-2 sm:col-span-3">
+        <p class="text-xs text-gray-400 mb-1.5">Maintenance</p>
+        <p class="text-sm font-medium text-gray-900">{maintainedLabel[tool.maintained]}</p>
+      </div>
+    </div>
+
+    <!-- Install -->
+    <div class="mb-8">
+      <h2 class="text-sm font-semibold text-gray-700 mb-3">Install</h2>
+      <div class="space-y-2">
+        {tool.install.map(method => (
+          <div class="flex items-center gap-3">
+            <span class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded font-mono w-16 text-center shrink-0">
+              {method}
+            </span>
+            <code class="text-sm bg-gray-900 text-gray-300 px-3 py-1.5 rounded font-mono flex-1 overflow-x-auto">
+              {installCommands[method] ?? `# see ${tool.name} docs`}
+            </code>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Example -->
+    <div class="mb-8">
+      <h2 class="text-sm font-semibold text-gray-700 mb-3">Usage Example</h2>
+      <pre class="bg-gray-900 text-green-400 px-4 py-3 rounded-lg font-mono text-sm overflow-x-auto whitespace-pre-wrap"><code>$ {tool.example}</code></pre>
+    </div>
+
+    <!-- External links -->
+    {(tool.homepage || tool.repo) && (
+      <div class="flex gap-4 text-sm pt-4 border-t border-gray-100">
+        {tool.homepage && (
+          <a href={tool.homepage} class="text-blue-600 hover:underline" target="_blank" rel="noopener">
+            Homepage →
+          </a>
+        )}
+        {tool.repo && (
+          <a href={tool.repo} class="text-blue-600 hover:underline" target="_blank" rel="noopener">
+            Repository →
+          </a>
+        )}
+      </div>
+    )}
+  </div>
+</BaseLayout>

@@ -1,0 +1,219 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ToolCard from '../components/ToolCard.astro';
+import { getTools, CATEGORY_LABELS, KIND_LABELS } from '../lib/tools';
+
+const tools = getTools();
+const categories = ['file-text', 'http-api', 'data-db', 'dev-code', 'ops', 'llm-agent'] as const;
+const kinds = ['traditional-cli', 'ai-native-cli', 'mcp-server'] as const;
+const highCount = tools.filter(t => t.agent_ready_level === 'high').length;
+---
+
+<BaseLayout title="llmcli — CLI Tools for AI Agents">
+  <!-- Hero -->
+  <div class="bg-gray-50 border-b border-gray-200">
+    <div class="max-w-6xl mx-auto px-4 py-10">
+      <div class="max-w-2xl">
+        <h1 class="text-3xl font-bold text-gray-900 mb-3">
+          CLI tools, rated for AI agents
+        </h1>
+        <p class="text-gray-600 text-base mb-6 leading-relaxed">
+          Find command-line tools your agents can actually call.
+          Every tool is scored on non-interactivity, machine-readable output, and predictable exit codes.
+        </p>
+        <div class="flex flex-wrap gap-6 text-sm text-gray-500">
+          <span><strong class="text-gray-900 font-semibold">{tools.length}</strong> tools</span>
+          <span><strong class="text-gray-900 font-semibold">{categories.length}</strong> categories</span>
+          <span><strong class="text-green-600 font-semibold">{highCount}</strong> agent-ready (high)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-6xl mx-auto px-4 py-8">
+    <!-- Pagefind search -->
+    <div class="mb-8">
+      <div id="search" class="max-w-xl"></div>
+    </div>
+
+    <!-- Filter bar -->
+    <div class="mb-6 space-y-3 pb-4 border-b border-gray-100">
+      <!-- Category -->
+      <div class="flex flex-wrap gap-2 items-center">
+        <span class="text-xs font-medium text-gray-400 w-20 shrink-0">Category</span>
+        <button
+          class="filter-btn text-xs px-3 py-1.5 rounded-full border font-medium bg-gray-900 text-white border-gray-900"
+          data-filter-type="category"
+          data-filter-value="all"
+        >All</button>
+        {categories.map(cat => (
+          <button
+            class="filter-btn text-xs px-3 py-1.5 rounded-full border border-gray-200 text-gray-600 hover:border-gray-400 font-medium transition-colors"
+            data-filter-type="category"
+            data-filter-value={cat}
+          >{CATEGORY_LABELS[cat]}</button>
+        ))}
+      </div>
+
+      <!-- Kind -->
+      <div class="flex flex-wrap gap-2 items-center">
+        <span class="text-xs font-medium text-gray-400 w-20 shrink-0">Kind</span>
+        <button
+          class="filter-btn text-xs px-3 py-1.5 rounded-full border font-medium bg-gray-900 text-white border-gray-900"
+          data-filter-type="kind"
+          data-filter-value="all"
+        >All</button>
+        {kinds.map(kind => (
+          <button
+            class="filter-btn text-xs px-3 py-1.5 rounded-full border border-gray-200 text-gray-600 hover:border-gray-400 font-medium transition-colors"
+            data-filter-type="kind"
+            data-filter-value={kind}
+          >{KIND_LABELS[kind]}</button>
+        ))}
+      </div>
+
+      <!-- Agent ready level -->
+      <div class="flex flex-wrap gap-2 items-center">
+        <span class="text-xs font-medium text-gray-400 w-20 shrink-0">Agent</span>
+        <button
+          class="filter-btn text-xs px-3 py-1.5 rounded-full border font-medium bg-gray-900 text-white border-gray-900"
+          data-filter-type="level"
+          data-filter-value="all"
+        >All</button>
+        <button
+          class="filter-btn text-xs px-3 py-1.5 rounded-full border border-gray-200 text-green-700 hover:border-green-300 font-medium transition-colors"
+          data-filter-type="level"
+          data-filter-value="high"
+        >High</button>
+        <button
+          class="filter-btn text-xs px-3 py-1.5 rounded-full border border-gray-200 text-amber-700 hover:border-amber-300 font-medium transition-colors"
+          data-filter-type="level"
+          data-filter-value="medium"
+        >Medium</button>
+        <button
+          class="filter-btn text-xs px-3 py-1.5 rounded-full border border-gray-200 text-red-700 hover:border-red-300 font-medium transition-colors"
+          data-filter-type="level"
+          data-filter-value="low"
+        >Low</button>
+      </div>
+    </div>
+
+    <!-- Result count -->
+    <p class="text-sm text-gray-400 mb-4">
+      Showing <strong id="tool-count" class="text-gray-700">{tools.length} tools</strong>
+    </p>
+
+    <!-- Tool grid -->
+    <div id="tool-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {tools.map(tool => <ToolCard tool={tool} />)}
+    </div>
+
+    <!-- Empty state -->
+    <div id="empty-state" class="hidden text-center py-16 text-gray-400">
+      <p class="text-lg">No tools match these filters.</p>
+      <button id="reset-filters" class="mt-3 text-sm text-blue-600 hover:underline">Reset filters</button>
+    </div>
+  </div>
+</BaseLayout>
+
+<!-- Client-side filtering -->
+<script>
+  const state: Record<string, string> = {
+    category: 'all',
+    kind: 'all',
+    level: 'all',
+  };
+
+  function applyFilters() {
+    const cards = document.querySelectorAll<HTMLElement>('[data-tool-id]');
+    let visible = 0;
+
+    cards.forEach(card => {
+      const match =
+        (state.category === 'all' || card.dataset.category === state.category) &&
+        (state.kind === 'all' || card.dataset.kind === state.kind) &&
+        (state.level === 'all' || card.dataset.level === state.level);
+
+      card.style.display = match ? '' : 'none';
+      if (match) visible++;
+    });
+
+    const countEl = document.getElementById('tool-count');
+    if (countEl) countEl.textContent = `${visible} tool${visible !== 1 ? 's' : ''}`;
+
+    const emptyState = document.getElementById('empty-state');
+    const grid = document.getElementById('tool-grid');
+    if (emptyState && grid) {
+      emptyState.classList.toggle('hidden', visible > 0);
+      grid.classList.toggle('hidden', visible === 0);
+    }
+  }
+
+  document.querySelectorAll<HTMLElement>('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const type = btn.dataset.filterType!;
+      const value = btn.dataset.filterValue!;
+      state[type] = value;
+
+      // Update active styles within this filter group
+      document.querySelectorAll<HTMLElement>(`[data-filter-type="${type}"]`).forEach(b => {
+        const isActive = b.dataset.filterValue === value;
+        b.classList.toggle('bg-gray-900', isActive);
+        b.classList.toggle('text-white', isActive);
+        b.classList.toggle('border-gray-900', isActive);
+        b.classList.toggle('text-gray-600', !isActive && b.dataset.filterValue !== 'all');
+        b.classList.toggle('border-gray-200', !isActive);
+      });
+
+      applyFilters();
+    });
+  });
+
+  document.getElementById('reset-filters')?.addEventListener('click', () => {
+    Object.keys(state).forEach(k => (state[k] = 'all'));
+    document.querySelectorAll<HTMLElement>('.filter-btn').forEach(btn => {
+      const isAll = btn.dataset.filterValue === 'all';
+      btn.classList.toggle('bg-gray-900', isAll);
+      btn.classList.toggle('text-white', isAll);
+      btn.classList.toggle('border-gray-900', isAll);
+      btn.classList.toggle('border-gray-200', !isAll);
+    });
+    applyFilters();
+  });
+</script>
+
+<!-- Pagefind search (loads after build; silently skipped in dev) -->
+<script>
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = '/pagefind/pagefind-ui.css';
+  document.head.appendChild(link);
+
+  const script = document.createElement('script');
+  script.src = '/pagefind/pagefind-ui.js';
+  script.onload = () => {
+    // @ts-ignore
+    new PagefindUI({
+      element: '#search',
+      showSubResults: false,
+      placeholder: 'Search tools… e.g. "json", "database", "kubernetes"',
+      resetStyles: false,
+    });
+  };
+  document.head.appendChild(script);
+</script>
+
+<style>
+  /* Pagefind UI variable overrides */
+  #search {
+    --pagefind-ui-scale: 0.9;
+    --pagefind-ui-primary: #2563eb;
+    --pagefind-ui-text: #111827;
+    --pagefind-ui-background: #ffffff;
+    --pagefind-ui-border: #e5e7eb;
+    --pagefind-ui-tag: #f3f4f6;
+    --pagefind-ui-border-width: 1px;
+    --pagefind-ui-border-radius: 8px;
+    --pagefind-ui-font: system-ui, sans-serif;
+  }
+</style>

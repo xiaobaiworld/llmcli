@@ -1,0 +1,80 @@
+---
+import type { Tool } from '../lib/tools';
+import { CATEGORY_LABELS, CATEGORY_COLORS, KIND_LABELS, LEVEL_BG, LEVEL_DOT } from '../lib/tools';
+
+interface Props {
+  tool: Tool;
+}
+const { tool } = Astro.props;
+
+const scoreArray = Array.from({ length: 5 }, (_, i) => i < tool.agent_ready_score);
+const dotColor = LEVEL_DOT[tool.agent_ready_level];
+---
+
+<article
+  class="bg-white border border-gray-200 rounded-lg p-4 hover:border-gray-400 hover:shadow-sm transition-all flex flex-col gap-3"
+  data-tool-id={tool.id}
+  data-category={tool.category}
+  data-kind={tool.kind}
+  data-level={tool.agent_ready_level}
+>
+  <!-- Name + command + level badge -->
+  <div class="flex items-start justify-between gap-2">
+    <div class="min-w-0">
+      <h3 class="font-semibold text-gray-900 truncate">{tool.name}</h3>
+      <code class="text-xs bg-gray-900 text-green-400 px-2 py-0.5 rounded font-mono mt-1 inline-block">
+        {tool.command}
+      </code>
+    </div>
+    <span
+      class={`text-xs font-semibold px-2 py-1 rounded-full whitespace-nowrap shrink-0 ${LEVEL_BG[tool.agent_ready_level]}`}
+    >
+      {tool.agent_ready_level.toUpperCase()}
+    </span>
+  </div>
+
+  <!-- Notes -->
+  {tool.notes && (
+    <p class="text-sm text-gray-600 leading-relaxed line-clamp-2">{tool.notes}</p>
+  )}
+
+  <!-- Score dots -->
+  <div class="flex items-center gap-1">
+    {scoreArray.map(filled => (
+      <svg class={`w-2.5 h-2.5 ${filled ? dotColor : 'fill-gray-200'}`} viewBox="0 0 8 8">
+        <circle cx="4" cy="4" r="4" />
+      </svg>
+    ))}
+    <span class="text-xs text-gray-400 ml-1">{tool.agent_ready_score}/5</span>
+  </div>
+
+  <!-- Category + kind tags -->
+  <div class="flex flex-wrap gap-1.5">
+    <span class={`text-xs px-2 py-0.5 rounded-full font-medium ${CATEGORY_COLORS[tool.category]}`}>
+      {CATEGORY_LABELS[tool.category]}
+    </span>
+    <span class="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
+      {KIND_LABELS[tool.kind] ?? tool.kind}
+    </span>
+  </div>
+
+  <!-- Install methods -->
+  <div class="flex flex-wrap gap-1">
+    {tool.install.map(method => (
+      <span class="text-xs bg-gray-50 border border-gray-200 px-1.5 py-0.5 rounded font-mono text-gray-500">
+        {method}
+      </span>
+    ))}
+  </div>
+
+  <!-- Link -->
+  <a
+    href={`/tool/${tool.id}`}
+    class="text-xs text-blue-600 hover:text-blue-800 mt-auto pt-1 inline-flex items-center gap-1"
+  >
+    View details
+    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+    </svg>
+  </a>
+</article>
