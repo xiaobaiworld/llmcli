@@ -1,0 +1,76 @@
+---
+import type { App } from '../lib/apps';
+import { getCoverageStats, CATEGORY_LABELS, CATEGORY_COLORS } from '../lib/apps';
+
+interface Props {
+  app: App;
+}
+const { app } = Astro.props;
+
+const stats = getCoverageStats(app);
+
+// Coverage bar colour: ≥70% green, ≥40% amber, else red
+const barColor =
+  stats.coveragePercent >= 70
+    ? 'bg-green-500'
+    : stats.coveragePercent >= 40
+    ? 'bg-amber-400'
+    : 'bg-red-400';
+---
+
+<a
+  href={`/app/${app.id}`}
+  class="block bg-white border border-gray-200 rounded-xl p-5 hover:border-gray-400 hover:shadow-sm transition-all group"
+>
+  <!-- App name + category -->
+  <div class="flex items-start justify-between gap-2 mb-3">
+    <div class="min-w-0">
+      <h2 class="font-bold text-gray-900 text-base leading-tight group-hover:text-blue-600 transition-colors">
+        {app.name}
+      </h2>
+      <p class="text-sm text-gray-500 mt-1 line-clamp-2 leading-relaxed">{app.description}</p>
+    </div>
+    <span class={`text-xs font-medium px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 ${CATEGORY_COLORS[app.category] ?? 'bg-gray-100 text-gray-600'}`}>
+      {CATEGORY_LABELS[app.category] ?? app.category}
+    </span>
+  </div>
+
+  <!-- Coverage bar -->
+  <div class="mb-3">
+    <div class="flex items-center justify-between text-xs text-gray-400 mb-1">
+      <span>CLI/MCP 覆盖率</span>
+      <span class="font-semibold text-gray-700">{stats.coveragePercent}%</span>
+    </div>
+    <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+      <div
+        class={`h-full rounded-full transition-all ${barColor}`}
+        style={`width: ${stats.coveragePercent}%`}
+      />
+    </div>
+  </div>
+
+  <!-- Feature counts -->
+  <div class="flex gap-3 text-xs mb-4">
+    <span class="flex items-center gap-1 text-green-700">
+      <svg class="w-2 h-2 fill-green-500" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>
+      {stats.supported} 支持
+    </span>
+    <span class="flex items-center gap-1 text-amber-700">
+      <svg class="w-2 h-2 fill-amber-400" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>
+      {stats.partial} 部分
+    </span>
+    <span class="flex items-center gap-1 text-gray-400">
+      <svg class="w-2 h-2 fill-gray-300" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>
+      {stats.unsupported} 不支持
+    </span>
+  </div>
+
+  <!-- Tools list -->
+  <div class="flex flex-wrap gap-1.5">
+    {app.tools.map(t => (
+      <span class="text-xs font-mono bg-gray-50 border border-gray-200 px-1.5 py-0.5 rounded text-gray-600">
+        {t.name}
+      </span>
+    ))}
+  </div>
+</a>

@@ -1,0 +1,190 @@
+id: obsidian
+name: Obsidian
+description: 本地优先的 Markdown 知识库，支持双向链接与插件生态。
+homepage: https://obsidian.md
+category: notes
+
+tools:
+  - id: obsidian-mcp
+    name: obsidian-mcp（cyanheads）
+    type: mcp
+    install_cmd: "npx -y github:cyanheads/obsidian-mcp-server"
+    repo: https://github.com/cyanheads/obsidian-mcp-server
+    maintained: community
+
+  - id: mcpvault
+    name: mcpvault
+    type: mcp
+    install_cmd: "pip install mcpvault"
+    repo: https://github.com/mcpvault/mcpvault
+    maintained: community
+
+domains:
+  - id: note-management
+    name: 笔记管理
+    features:
+      - id: create-note
+        name: 创建笔记
+        status: supported
+        tool_id: obsidian-mcp
+        command: "mcp call obsidian.note.create path='Projects/llmcli.md' content='# llmcli\n\n内容...'"
+        input: |
+          path: Vault 内相对路径（含 .md 后缀）
+          content: Markdown 文本内容
+        output: '{ "path": "Projects/llmcli.md", "created": true }'
+
+      - id: read-note
+        name: 读取笔记内容
+        status: supported
+        tool_id: obsidian-mcp
+        command: "mcp call obsidian.note.read path='Projects/llmcli.md'"
+        output: |
+          {
+            "path": "Projects/llmcli.md",
+            "content": "# llmcli\n\n内容...",
+            "frontmatter": { "tags": ["project"] }
+          }
+
+      - id: update-note
+        name: 更新笔记内容
+        status: supported
+        tool_id: obsidian-mcp
+        command: "mcp call obsidian.note.update path='Projects/llmcli.md' content='# llmcli（更新）\n\n新内容'"
+        output: '{ "path": "Projects/llmcli.md", "updated": true }'
+        notes: "全量覆盖，如需追加请先 read 再合并"
+
+      - id: append-to-note
+        name: 追加内容到笔记末尾
+        status: supported
+        tool_id: obsidian-mcp
+        command: "mcp call obsidian.note.append path='Daily/2026-01-10.md' content='\n- [ ] 新任务'"
+        output: '{ "path": "Daily/2026-01-10.md", "appended": true }'
+
+      - id: delete-note
+        name: 删除笔记
+        status: supported
+        tool_id: obsidian-mcp
+        command: "mcp call obsidian.note.delete path='Drafts/old-draft.md'"
+        output: '{ "deleted": true }'
+
+      - id: move-rename-note
+        name: 移动 / 重命名笔记
+        status: partial
+        tool_id: obsidian-mcp
+        notes: "通过 create + delete 组合实现，无原子 rename 接口"
+        gap_reason: "MCP server 未暴露 Obsidian 内置 rename 命令"
+
+      - id: list-notes
+        name: 列出目录下所有笔记
+        status: supported
+        tool_id: obsidian-mcp
+        command: "mcp call obsidian.vault.list folder='Projects'"
+        output: '{ "files": ["Projects/llmcli.md", "Projects/ideas.md"] }'
+
+  - id: search
+    name: 搜索
+    features:
+      - id: full-text-search
+        name: 全文搜索
+        status: supported
+        tool_id: obsidian-mcp
+        command: "mcp call obsidian.search.text query='agent MCP'"
+        output: |
+          {
+            "results": [
+              { "path": "Projects/llmcli.md", "matches": ["...agent MCP..."] }
+            ]
+          }
+        notes: "依赖 Obsidian 内置全文索引（需打开 Vault）"
+
+      - id: search-by-tag
+        name: 按标签搜索
+        status: supported
+        tool_id: obsidian-mcp
+        command: "mcp call obsidian.search.tag tag='project'"
+        output: '{ "results": ["Projects/llmcli.md", "Projects/ideas.md"] }'
+
+      - id: search-by-frontmatter
+        name: 按 Frontmatter 字段搜索
+        status: supported
+        tool_id: mcpvault
+        command: "mcp call vault.query frontmatter_key='status' frontmatter_value='active'"
+        output: '{ "results": [...] }'
+        notes: "mcpvault 支持 Dataview 风格的 frontmatter 查询"
+
+      - id: regex-search
+        name: 正则表达式搜索
+        status: partial
+        tool_id: obsidian-mcp
+        command: "mcp call obsidian.search.text query='/TODO:.+/' use_regex=true"
+        notes: "支持简单正则，复杂模式可能超时"
+        gap_reason: "大型 Vault（>5000 文件）下性能有限"
+
+      - id: semantic-search
+        name: 语义向量搜索
+        status: unsupported
+        gap_reason: "需要第三方插件（Smart Connections），MCP 工具暂不支持"
+
+  - id: tags
+    name: 标签管理
+    features:
+      - id: add-tag
+        name: 给笔记添加标签
+        status: supported
+        tool_id: obsidian-mcp
+        command: "mcp call obsidian.note.frontmatter.update path='Projects/llmcli.md' key='tags' value='[\"project\",\"ai\"]'"
+        output: '{ "updated": true }'
+
+      - id: list-all-tags
+        name: 列出 Vault 所有标签
+        status: supported
+        tool_id: obsidian-mcp
+        command: "mcp call obsidian.vault.tags"
+        output: '{ "tags": ["project", "ai", "daily", "reference"] }'
+
+      - id: rename-tag
+        name: 批量重命名标签
+        status: unsupported
+        gap_reason: "需 Obsidian 内置 Tag Wrangler 插件，MCP 未实现此操作"
+
+      - id: tag-hierarchy
+        name: 查询嵌套标签层级
+        status: partial
+        tool_id: obsidian-mcp
+        command: "mcp call obsidian.vault.tags"
+        notes: "返回扁平标签列表，层级关系（project/active）需客户端解析"
+        gap_reason: "无树状结构返回，嵌套结构需自行解析 '/' 分隔"
+
+  - id: canvas
+    name: Canvas
+    features:
+      - id: read-canvas
+        name: 读取 Canvas 节点数据
+        status: supported
+        tool_id: obsidian-mcp
+        command: "mcp call obsidian.note.read path='Mindmaps/arch.canvas'"
+        output: |
+          {
+            "content": "{\"nodes\":[...],\"edges\":[...]}",
+            "path": "Mindmaps/arch.canvas"
+          }
+        notes: "Canvas 文件本质是 JSON，read 返回原始 JSON 字符串"
+
+      - id: create-canvas
+        name: 创建 Canvas 文件
+        status: supported
+        tool_id: obsidian-mcp
+        command: "mcp call obsidian.note.create path='Mindmaps/new.canvas' content='{\"nodes\":[],\"edges\":[]}'"
+        output: '{ "path": "Mindmaps/new.canvas", "created": true }'
+
+      - id: add-canvas-node
+        name: 添加节点到 Canvas
+        status: partial
+        tool_id: obsidian-mcp
+        notes: "需 read → 解析 JSON → 追加 node → write 回去，无专用 API"
+        gap_reason: "无原子 add-node 接口，多步操作存在并发覆盖风险"
+
+      - id: visual-render-canvas
+        name: 渲染 Canvas 为图片
+        status: unsupported
+        gap_reason: "Canvas 渲染依赖 Electron GUI，无 headless 导出支持"

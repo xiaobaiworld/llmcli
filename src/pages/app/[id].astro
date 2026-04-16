@@ -1,0 +1,182 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ToolBadge from '../../components/ToolBadge.astro';
+import CoverageRow from '../../components/CoverageRow.astro';
+import {
+  getApps,
+  getCoverageStats,
+  CATEGORY_LABELS,
+  STATUS_COLORS,
+} from '../../lib/apps';
+import type { App } from '../../lib/apps';
+
+export async function getStaticPaths() {
+  const apps = getApps();
+  return apps.map(app => ({
+    params: { id: app.id },
+    props: { app },
+  }));
+}
+
+interface Props {
+  app: App;
+}
+const { app } = Astro.props;
+
+const stats = getCoverageStats(app);
+
+const barColor =
+  stats.coveragePercent >= 70
+    ? 'bg-green-500'
+    : stats.coveragePercent >= 40
+    ? 'bg-amber-400'
+    : 'bg-red-400';
+
+// Gaps: features that are unsupported or partial
+const gaps = app.domains.flatMap(d =>
+  d.features
+    .filter(f => f.status !== 'supported')
+    .map(f => ({ domain: d.name, feature: f }))
+);
+---
+
+<BaseLayout
+  title={`${app.name} CLI/MCP 覆盖 — llmcli`}
+  description={`${app.name} 的 CLI/MCP 功能覆盖矩阵：哪些操作 AI agent 能直接调用，哪些不行。`}
+>
+  <div data-pagefind-body>
+
+    <!-- Breadcrumb -->
+    <div class="border-b border-gray-200 bg-gray-50">
+      <div class="max-w-5xl mx-auto px-4 py-3 text-sm text-gray-400">
+        <a href="/" class="hover:text-gray-700 transition-colors">首页</a>
+        <span class="mx-2">/</span>
+        <span class="text-gray-700">{app.name}</span>
+      </div>
+    </div>
+
+    <div class="max-w-5xl mx-auto px-4 py-8 space-y-10">
+
+      <!-- ── 区块 1：应用概览 ── -->
+      <section>
+        <div class="flex items-start justify-between gap-4 mb-4">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-xs font-medium text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
+                {CATEGORY_LABELS[app.category] ?? app.category}
+              </span>
+              {app.homepage && (
+                <a
+                  href={app.homepage}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-xs text-blue-500 hover:text-blue-700 transition-colors"
+                >
+                  官网 ↗
+                </a>
+              )}
+            </div>
+            <h1 class="text-2xl font-bold text-gray-900">{app.name}</h1>
+            <p class="text-gray-500 mt-1 leading-relaxed">{app.description}</p>
+          </div>
+
+          <!-- Coverage summary -->
+          <div class="text-right shrink-0 hidden sm:block">
+            <div class="text-3xl font-bold text-gray-900">{stats.coveragePercent}%</div>
+            <div class="text-xs text-gray-400 mt-0.5">CLI/MCP 覆盖率</div>
+          </div>
+        </div>
+
+        <!-- Coverage bar -->
+        <div class="mb-4">
+          <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+            <div
+              class={`h-full rounded-full ${barColor}`}
+              style={`width: ${stats.coveragePercent}%`}
+            />
+          </div>
+          <div class="flex gap-4 mt-2 text-xs">
+            <span class="flex items-center gap-1 text-green-700">
+              <svg class="w-2 h-2 fill-green-500" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>
+              {stats.supported} 支持
+            </span>
+            <span class="flex items-center gap-1 text-amber-700">
+              <svg class="w-2 h-2 fill-amber-400" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>
+              {stats.partial} 部分支持
+            </span>
+            <span class="flex items-center gap-1 text-gray-400">
+              <svg class="w-2 h-2 fill-gray-300" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>
+              {stats.unsupported} 不支持
+            </span>
+          </div>
+        </div>
+
+        <!-- Tool list -->
+        <div class="flex flex-wrap gap-2">
+          {app.tools.map(tool => <ToolBadge tool={tool} />)}
+        </div>
+      </section>
+
+      <!-- ── 区块 2：功能覆盖矩阵 ── -->
+      <section>
+        <h2 class="text-lg font-bold text-gray-900 mb-5">功能覆盖矩阵</h2>
+        <div class="space-y-6">
+          {app.domains.map(domain => {
+            const domainSupported = domain.features.filter(f => f.status === 'supported').length;
+            const domainTotal = domain.features.length;
+            return (
+              <div class="border border-gray-200 rounded-xl overflow-hidden">
+                <!-- Domain header -->
+                <div class="bg-gray-50 border-b border-gray-200 px-4 py-2.5 flex items-center justify-between">
+                  <h3 class="font-semibold text-gray-900 text-sm">{domain.name}</h3>
+                  <span class="text-xs text-gray-400">{domainSupported}/{domainTotal} 支持</span>
+                </div>
+                <!-- Feature rows -->
+                <div class="divide-y divide-gray-100 px-4">
+                  {domain.features.map(feature => (
+                    <CoverageRow feature={feature} tools={app.tools} />
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      <!-- ── 区块 3：Gap 总结 ── -->
+      {gaps.length > 0 && (
+        <section>
+          <h2 class="text-lg font-bold text-gray-900 mb-4">
+            Gap 总结
+            <span class="ml-2 text-sm font-normal text-gray-400">({gaps.length} 个功能缺口)</span>
+          </h2>
+          <div class="bg-red-50 border border-red-100 rounded-xl divide-y divide-red-100">
+            {gaps.map(({ domain, feature }) => (
+              <div class="px-4 py-3 flex items-start gap-3">
+                <span class={`text-xs font-semibold px-2 py-0.5 rounded-full mt-0.5 shrink-0 ${STATUS_COLORS[feature.status]}`}>
+                  {feature.status === 'partial' ? '部分' : '不支持'}
+                </span>
+                <div class="min-w-0">
+                  <p class="text-sm text-gray-800">
+                    <span class="text-gray-400 text-xs mr-1">{domain} ›</span>
+                    {feature.name}
+                  </p>
+                  {feature.gap_reason && (
+                    <p class="text-xs text-gray-500 mt-0.5 leading-relaxed">{feature.gap_reason}</p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <!-- Back link -->
+      <div class="pt-2 border-t border-gray-100">
+        <a href="/" class="text-sm text-gray-400 hover:text-gray-700 transition-colors">
+          ← 返回应用列表
+        </a>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

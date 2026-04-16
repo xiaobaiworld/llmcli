@@ -1,0 +1,104 @@
+---
+import type { Feature, AppTool } from '../lib/apps';
+import { STATUS_LABELS, STATUS_COLORS } from '../lib/apps';
+
+interface Props {
+  feature: Feature;
+  /** All tools for the parent App (used to look up tool name by tool_id) */
+  tools: AppTool[];
+}
+const { feature, tools } = Astro.props;
+
+const tool = feature.tool_id ? tools.find(t => t.id === feature.tool_id) : undefined;
+const statusColor = STATUS_COLORS[feature.status];
+const statusLabel = STATUS_LABELS[feature.status];
+
+// Unique id for the <details> toggle
+const detailsId = `feat-${feature.id}`;
+---
+
+<div class="border-b border-gray-100 last:border-0">
+  <!-- Summary row — always visible -->
+  <div class="flex items-center gap-3 py-2.5 px-1">
+    <!-- Status badge -->
+    <span class={`text-xs font-semibold px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 ${statusColor}`}>
+      {statusLabel}
+    </span>
+
+    <!-- Feature name -->
+    <span class="text-sm text-gray-800 flex-1 min-w-0">{feature.name}</span>
+
+    <!-- Tool name chip -->
+    {tool && (
+      <span class="text-xs font-mono text-gray-400 bg-gray-50 border border-gray-200 px-1.5 py-0.5 rounded hidden sm:inline shrink-0">
+        {tool.name}
+      </span>
+    )}
+
+    <!-- Expand toggle (only if there's detail to show) -->
+    {(feature.command || feature.gap_reason || feature.notes) && (
+      <button
+        class="expand-toggle text-gray-300 hover:text-gray-600 transition-colors shrink-0"
+        data-target={detailsId}
+        aria-expanded="false"
+        aria-label="展开详情"
+      >
+        <svg class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+    )}
+  </div>
+
+  <!-- Detail panel — hidden by default -->
+  {(feature.command || feature.gap_reason || feature.notes) && (
+    <div id={detailsId} class="hidden pb-3 px-1 space-y-2">
+      {feature.command && (
+        <div>
+          <p class="text-xs font-medium text-gray-400 mb-1">命令</p>
+          <pre class="text-xs bg-gray-900 text-green-400 rounded px-3 py-2 overflow-x-auto font-mono leading-relaxed">{feature.command}</pre>
+        </div>
+      )}
+      {feature.input && (
+        <div>
+          <p class="text-xs font-medium text-gray-400 mb-1">输入参数</p>
+          <pre class="text-xs bg-gray-50 border border-gray-200 rounded px-3 py-2 overflow-x-auto font-mono text-gray-700 leading-relaxed">{feature.input}</pre>
+        </div>
+      )}
+      {feature.output && (
+        <div>
+          <p class="text-xs font-medium text-gray-400 mb-1">示例输出</p>
+          <pre class="text-xs bg-gray-50 border border-gray-200 rounded px-3 py-2 overflow-x-auto font-mono text-gray-700 leading-relaxed">{feature.output}</pre>
+        </div>
+      )}
+      {feature.notes && (
+        <p class="text-xs text-gray-500 leading-relaxed">
+          <span class="font-medium text-gray-600">备注：</span>{feature.notes}
+        </p>
+      )}
+      {feature.gap_reason && (
+        <p class="text-xs text-red-600 bg-red-50 rounded px-2 py-1 leading-relaxed">
+          <span class="font-medium">Gap：</span>{feature.gap_reason}
+        </p>
+      )}
+    </div>
+  )}
+</div>
+
+<script>
+  // Toggle expand/collapse for all rows on the page
+  document.querySelectorAll<HTMLButtonElement>('.expand-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetId = btn.dataset.target!;
+      const panel = document.getElementById(targetId);
+      if (!panel) return;
+
+      const isOpen = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', String(!isOpen));
+      panel.classList.toggle('hidden', isOpen);
+
+      const icon = btn.querySelector('svg');
+      icon?.classList.toggle('rotate-180', !isOpen);
+    });
+  });
+</script>

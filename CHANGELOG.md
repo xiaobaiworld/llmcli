@@ -1,6 +1,34 @@
 # Changelog
 
-## [Unreleased] — Phase 2
+## [0.2.0] — 2026-04-16 — Phase 2: App 覆盖矩阵
+
+### 新增
+- `data/apps.schema.json`：App YAML JSON Schema 验证
+- `data/apps/feishu.yaml`：飞书/Lark 覆盖矩阵（7 域 31 功能，工具：larksuite/cli + lark-openapi-mcp）
+- `data/apps/wecom.yaml`：企业微信覆盖矩阵（6 域 27 功能，工具：wecom-cli + wecom-mcp）
+- `data/apps/obsidian.yaml`：Obsidian 覆盖矩阵（4 域 16 功能，工具：obsidian-mcp + mcpvault）
+- `src/lib/apps.ts`：App 数据层（getApps / getApp / getCoverageStats，完整 TS 类型 + JSDoc）
+- `src/components/AppCard.astro`：应用卡片（覆盖率进度条、三色统计、工具列表）
+- `src/components/CoverageRow.astro`：功能覆盖行（点击展开命令/参数/输出/gap）
+- `src/components/ToolBadge.astro`：CLI/MCP 工具标签（类型、维护状态、GitHub 链接）
+- `src/pages/app/[id].astro`：应用详情页（概览 + 矩阵 + Gap 总结，data-pagefind-body）
+
+### 修改
+- `src/pages/index.astro`：重构为 App 网格首页，保留旧通用工具目录入口
+
+### 构建结果
+- 54 个页面（3 App 详情 + 1 首页 + 50 工具详情）
+- Pagefind 索引：53 页，1126 词
+- 构建时间：~820ms
+
+### 技术决策
+- App YAML 设计：以「域 → 功能」二级结构组织，每个功能独立标注 supported/partial/unsupported
+- CoverageRow 展开：纯 JS toggle（无框架依赖），避免 Astro island 过度复杂化
+- 覆盖率计算：partial 按 0.5 权重计入，避免和 supported 等权
+
+---
+
+## [Unreleased] — Phase 3
 
 ---
 

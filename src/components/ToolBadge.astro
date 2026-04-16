@@ -1,0 +1,61 @@
+---
+import type { AppTool } from '../lib/apps';
+import { TOOL_TYPE_LABELS } from '../lib/apps';
+
+interface Props {
+  tool: AppTool;
+}
+const { tool } = Astro.props;
+
+const typeColor: Record<string, string> = {
+  cli: 'bg-gray-900 text-green-400',
+  mcp: 'bg-violet-100 text-violet-800',
+  'mcp-remote': 'bg-violet-100 text-violet-700',
+  api: 'bg-blue-100 text-blue-800',
+};
+
+const maintainedDot: Record<string, string> = {
+  official: 'fill-green-500',
+  community: 'fill-amber-400',
+  unknown: 'fill-gray-300',
+};
+
+const maintainedLabel: Record<string, string> = {
+  official: '官方维护',
+  community: '社区维护',
+  unknown: '状态未知',
+};
+---
+
+<div class="inline-flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-2 bg-white text-sm">
+  <!-- Type badge -->
+  <span class={`font-mono text-xs font-semibold px-1.5 py-0.5 rounded ${typeColor[tool.type] ?? 'bg-gray-100 text-gray-600'}`}>
+    {TOOL_TYPE_LABELS[tool.type] ?? tool.type}
+  </span>
+
+  <!-- Tool name -->
+  <span class="font-medium text-gray-900">{tool.name}</span>
+
+  <!-- Maintained indicator -->
+  <span class="flex items-center gap-1 text-xs text-gray-400">
+    <svg class={`w-2 h-2 ${maintainedDot[tool.maintained]}`} viewBox="0 0 8 8">
+      <circle cx="4" cy="4" r="4" />
+    </svg>
+    {maintainedLabel[tool.maintained]}
+  </span>
+
+  <!-- Repo link -->
+  {tool.repo && (
+    <a
+      href={tool.repo}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="text-gray-400 hover:text-gray-700 transition-colors"
+      title="GitHub repo"
+    >
+      <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.741 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z" />
+      </svg>
+    </a>
+  )}
+</div>

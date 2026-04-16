@@ -1,0 +1,253 @@
+id: feishu
+name: 飞书 / Lark
+description: 字节跳动出品的企业协作套件，覆盖 IM、文档、日历、会议等。
+homepage: https://www.feishu.cn
+category: enterprise-collab
+
+tools:
+  - id: larksuite-cli
+    name: larksuite/cli
+    type: cli
+    install_cmd: "npm install -g @larksuite/cli"
+    repo: https://github.com/larksuite/cli
+    maintained: official
+    agent_skills: 22
+
+  - id: lark-openapi-mcp
+    name: lark-openapi-mcp
+    type: mcp
+    install_cmd: "npx @larksuite/lark-openapi-mcp"
+    repo: https://github.com/larksuite/lark-openapi-mcp
+    maintained: official
+
+domains:
+  - id: messenger
+    name: 消息 / IM
+    features:
+      - id: send-text-message
+        name: 发送文字消息（单聊）
+        status: supported
+        tool_id: larksuite-cli
+        command: "lark im message send --user @alice --text 'Hello'"
+        input: |
+          --user: 用户 open_id 或 @mention
+          --text: 消息文字内容
+        output: |
+          { "message_id": "om_xxx", "status": "sent" }
+        notes: "支持 text / markdown / card 格式"
+
+      - id: send-group-message
+        name: 发送消息到群组
+        status: supported
+        tool_id: larksuite-cli
+        command: "lark im message send --chat @dev-team --text 'Deploy done'"
+        input: "--chat: 群组 chat_id 或 @mention"
+        output: '{ "message_id": "om_xxx" }'
+
+      - id: send-rich-card
+        name: 发送卡片消息
+        status: supported
+        tool_id: lark-openapi-mcp
+        command: "mcp call im.message.create type=interactive card='{...}'"
+        input: "card: 飞书卡片 JSON（支持 Button / InputForm / Markdown）"
+        output: '{ "message_id": "om_xxx" }'
+        notes: "MCP 工具直接调用 OpenAPI，card 内容自由组合"
+
+      - id: recall-message
+        name: 撤回消息
+        status: unsupported
+        gap_reason: "CLI 暂未实现，API 支持但需代码调用"
+
+      - id: list-unread
+        name: 获取未读消息列表
+        status: partial
+        tool_id: lark-openapi-mcp
+        command: "mcp call im.message.list container_id_type=chat container_id=xxx"
+        notes: "MCP 可获取消息列表，但不区分已读/未读"
+        gap_reason: "未读标记需通过 im.message.patch 单独更新"
+
+  - id: docs
+    name: 云文档
+    features:
+      - id: create-doc
+        name: 创建文档
+        status: supported
+        tool_id: larksuite-cli
+        command: "lark docs create --title '会议记录' --folder-token fldcnXxx"
+        input: |
+          --title: 文档标题
+          --folder-token: 目标文件夹 token
+        output: '{ "doc_token": "doxcnXxx", "url": "https://feishu.cn/docx/..." }'
+
+      - id: read-doc-content
+        name: 读取文档内容
+        status: supported
+        tool_id: lark-openapi-mcp
+        command: "mcp call docx.document.raw_content document_id=doxcnXxx"
+        output: '{ "content": "# 标题\n\n正文..." }'
+        notes: "返回 Markdown 纯文本，适合 AI 摘要"
+
+      - id: append-doc-block
+        name: 追加内容块
+        status: supported
+        tool_id: lark-openapi-mcp
+        command: "mcp call docx.document.block.children.create document_id=doxcnXxx children='[{...}]'"
+        input: "children: Block JSON 数组（paragraph / heading / code / table）"
+        output: '{ "children": [...] }'
+
+      - id: ai-compose
+        name: AI 智能创作
+        status: unsupported
+        gap_reason: "仅限 GUI，未开放 API"
+
+      - id: doc-comment
+        name: 添加评论
+        status: supported
+        tool_id: lark-openapi-mcp
+        command: "mcp call drive.file.comment.create file_token=doxcnXxx content='LGTM'"
+        output: '{ "comment_id": "xxx" }'
+
+  - id: bitable
+    name: 多维表格 / Bitable
+    features:
+      - id: create-table
+        name: 创建多维表格
+        status: supported
+        tool_id: lark-openapi-mcp
+        command: "mcp call bitable.app.create name='任务追踪'"
+        output: '{ "app_token": "bascnXxx", "url": "https://feishu.cn/base/..." }'
+
+      - id: add-record
+        name: 添加记录
+        status: supported
+        tool_id: lark-openapi-mcp
+        command: "mcp call bitable.app.table.record.create app_token=bascnXxx table_id=tblXxx fields='{\"标题\":\"Bug #123\",\"状态\":\"待处理\"}'"
+        output: '{ "record_id": "recXxx" }'
+
+      - id: batch-get-records
+        name: 批量查询记录
+        status: supported
+        tool_id: lark-openapi-mcp
+        command: "mcp call bitable.app.table.record.list app_token=bascnXxx table_id=tblXxx filter='CurrentValue.[状态]=\"待处理\"'"
+        output: '{ "items": [...], "total": 12 }'
+        notes: "支持过滤表达式，最多返回 500 条"
+
+      - id: create-field
+        name: 新增字段
+        status: supported
+        tool_id: lark-openapi-mcp
+        command: "mcp call bitable.app.table.field.create app_token=bascnXxx table_id=tblXxx field_name='优先级' type=3"
+        output: '{ "field_id": "fldXxx" }'
+
+      - id: form-submit
+        name: 填写表单（表格视图）
+        status: unsupported
+        gap_reason: "表单提交仅限 Web GUI，API 无对应入口"
+
+  - id: calendar
+    name: 日历
+    features:
+      - id: create-event
+        name: 创建日程
+        status: supported
+        tool_id: lark-openapi-mcp
+        command: "mcp call calendar.event.create calendar_id=primary summary='周会' start_time=1735200000 end_time=1735203600"
+        input: |
+          summary: 日程标题
+          start_time / end_time: Unix 时间戳（秒）
+        output: '{ "event_id": "evtXxx" }'
+
+      - id: list-events
+        name: 查询日程列表
+        status: supported
+        tool_id: lark-openapi-mcp
+        command: "mcp call calendar.event.list calendar_id=primary start_time=1735200000 end_time=1735286400"
+        output: '{ "items": [...] }'
+
+      - id: delete-event
+        name: 删除日程
+        status: supported
+        tool_id: lark-openapi-mcp
+        command: "mcp call calendar.event.delete calendar_id=primary event_id=evtXxx"
+        output: '{}'
+
+      - id: meeting-room-reserve
+        name: 预约会议室
+        status: partial
+        tool_id: lark-openapi-mcp
+        notes: "需先查询 room_id，再将 room 添加至 event attendees"
+        gap_reason: "无专用 book-room 命令，需多步骤组合"
+
+  - id: meeting
+    name: 视频会议
+    features:
+      - id: create-meeting
+        name: 发起即时会议（获取入会链接）
+        status: supported
+        tool_id: lark-openapi-mcp
+        command: "mcp call vc.reserve.apply reserve_type=1"
+        output: '{ "reserve_id": "xxx", "join_url": "https://meetings.feishu.cn/..." }'
+
+      - id: get-meeting-summary
+        name: 获取会议录制/纪要
+        status: partial
+        tool_id: lark-openapi-mcp
+        notes: "可获取录制下载链接，AI 纪要仅限 GUI 查看"
+        gap_reason: "AI 纪要文本未通过 API 开放"
+
+      - id: end-meeting
+        name: 强制结束会议
+        status: unsupported
+        gap_reason: "API 暂不支持主动结束进行中的会议"
+
+  - id: task
+    name: 任务
+    features:
+      - id: create-task
+        name: 创建任务
+        status: supported
+        tool_id: lark-openapi-mcp
+        command: "mcp call task.task.create summary='修复登录 Bug' due='{\"timestamp\":\"1735286400\"}'"
+        output: '{ "task_id": "tskXxx" }'
+
+      - id: complete-task
+        name: 完成任务
+        status: supported
+        tool_id: lark-openapi-mcp
+        command: "mcp call task.task.patch task_id=tskXxx completed_at=now"
+        output: '{ "task_id": "tskXxx", "completed_at": "..." }'
+
+      - id: assign-task
+        name: 指派任务负责人
+        status: supported
+        tool_id: lark-openapi-mcp
+        command: "mcp call task.task.collaborator.create task_id=tskXxx user_id=ou_xxx role_type=1"
+        output: '{ "collaborator": { "user_id": "ou_xxx" } }'
+
+      - id: bulk-import-tasks
+        name: 批量导入任务
+        status: unsupported
+        gap_reason: "API 仅支持单条创建，无 batch create 接口"
+
+  - id: email
+    name: 邮件
+    features:
+      - id: send-email
+        name: 发送邮件
+        status: supported
+        tool_id: lark-openapi-mcp
+        command: "mcp call mail.user_mailbox.message.send to='bob@company.com' subject='Report' body='<p>See attached</p>'"
+        output: '{ "message_id": "xxx" }'
+        notes: "支持 HTML body，可附带附件 token"
+
+      - id: list-emails
+        name: 查询收件箱
+        status: supported
+        tool_id: lark-openapi-mcp
+        command: "mcp call mail.user_mailbox.message.list user_mailbox_id=me page_size=20"
+        output: '{ "items": [...] }'
+
+      - id: delete-email
+        name: 删除邮件
+        status: unsupported
+        gap_reason: "飞书邮件 API 暂不支持删除操作"
