@@ -1,10 +1,38 @@
-# llmcli — CLI Tool Navigator
+# llmcli — AI Agent 应用操作手册
 
-A navigation website that catalogs command-line tools in two categories:
-1. **Traditional software** that exposes CLI interfaces (or wrappers that add CLI to GUI-only apps)
-2. **AI/LLM tools** packaged as CLI tools, ready for agent invocation
+**产品定位**：以具体生产力应用（飞书、企业微信、Obsidian 等）为中心，精确告诉 AI agent 开发者：
+- 这个应用有哪些 CLI / MCP 工具可用
+- 每个功能是否可以通过命令行完成（支持 / 部分支持 / 不支持）
+- 可用功能：提供可直接复用的命令示例（输入 → 输出）
+- 不可用功能：说明原因和替代方案
 
-The core insight: as AI agents take over more workflows, tools need CLI interfaces to be usable. This site helps developers and AI engineers discover what's already available — so they don't rebuild what exists.
+**一句话**：给 AI agent 的应用操作手册。
+
+---
+
+## 🚨 新 Session 必读
+
+1. 先读 `docs/index.md` — 了解所有文档位置和项目当前状态
+2. 再读 `NEXT.md` — 知道当前阶段要做什么，从哪里继续
+3. 按 `NEXT.md` 的步骤清单逐步执行，完成一步打一个 ✅
+4. 所有文档放在 `docs/` 目录，`docs/index.md` 是索引
+
+## 开发工作流
+
+```
+读 docs/index.md → 读 NEXT.md → 逐步执行 → 检查 → 写 CHANGELOG.md → git commit/push → 清空 NEXT.md 写下一阶段
+```
+
+## 开发原则
+
+1. **YAML 是唯一数据源** — 内容只改 YAML，代码不硬编码数据
+2. **先文档后代码** — Phase 开始前 NEXT.md 要有完整步骤
+3. **每步一 commit** — 不积累大量未提交改动
+4. **构建必须通过** — 每次提交前 `npm run build` 零错误
+5. **代码有注释** — `.ts` 文件函数和接口加 JSDoc 注释
+6. **CHANGELOG 必须更新** — 每阶段结束描述产出
+
+---
 
 ---
 
