@@ -1,0 +1,171 @@
+id: slack
+name: Slack
+description: 面向团队的频道制即时通讯平台，支持工作流自动化与丰富的应用集成生态。
+homepage: https://slack.com
+category: enterprise-collab
+
+tools:
+  - id: slack-mcp
+    name: slack-mcp-server（官方）
+    type: mcp
+    install_cmd: "npx @modelcontextprotocol/server-slack"
+    repo: https://github.com/modelcontextprotocol/servers/tree/main/src/slack
+    maintained: official
+
+  - id: slack-cli
+    name: Slack CLI
+    type: cli
+    install_cmd: "brew install slack-cli"
+    repo: https://github.com/slackapi/slack-cli
+    maintained: official
+
+domains:
+  - id: messenger
+    name: 消息
+    features:
+      - id: send-message
+        name: 发送频道消息
+        status: supported
+        tool_id: slack-mcp
+        command: "mcp call slack.chat.postMessage channel='#general' text='Deploy done :white_check_mark:'"
+        input: |
+          channel: 频道名（#general）或 channel_id
+          text: 消息内容（支持 Slack mrkdwn 格式）
+        output: '{ "ok": true, "ts": "1715000000.000100", "channel": "C01234" }'
+
+      - id: send-dm
+        name: 发送私信（DM）
+        status: supported
+        tool_id: slack-mcp
+        command: "mcp call slack.chat.postMessage channel='@alice' text='Hi, 记得提交周报'"
+        output: '{ "ok": true, "ts": "xxx" }'
+        notes: "channel 填用户名或 user_id 均可"
+
+      - id: send-thread-reply
+        name: 回复消息线程
+        status: supported
+        tool_id: slack-mcp
+        command: "mcp call slack.chat.postMessage channel=C01234 text='已修复，请 review' thread_ts='1715000000.000100'"
+        output: '{ "ok": true, "ts": "1715000001.000200" }'
+
+      - id: update-message
+        name: 编辑已发消息
+        status: supported
+        tool_id: slack-mcp
+        command: "mcp call slack.chat.update channel=C01234 ts='1715000000.000100' text='（已更新）Deploy done'"
+        output: '{ "ok": true }'
+
+      - id: delete-message
+        name: 删除消息
+        status: supported
+        tool_id: slack-mcp
+        command: "mcp call slack.chat.delete channel=C01234 ts='1715000000.000100'"
+        output: '{ "ok": true }'
+
+      - id: add-reaction
+        name: 添加 Emoji 反应
+        status: supported
+        tool_id: slack-mcp
+        command: "mcp call slack.reactions.add channel=C01234 timestamp='1715000000.000100' name='white_check_mark'"
+        output: '{ "ok": true }'
+
+  - id: channels
+    name: 频道
+    features:
+      - id: list-channels
+        name: 获取频道列表
+        status: supported
+        tool_id: slack-mcp
+        command: "mcp call slack.conversations.list types=public_channel,private_channel limit=100"
+        output: '{ "channels": [{ "id": "C01234", "name": "general", "num_members": 42 }] }'
+
+      - id: create-channel
+        name: 创建频道
+        status: supported
+        tool_id: slack-mcp
+        command: "mcp call slack.conversations.create name='project-phoenix' is_private=false"
+        output: '{ "channel": { "id": "C05678", "name": "project-phoenix" } }'
+
+      - id: invite-to-channel
+        name: 邀请用户加入频道
+        status: supported
+        tool_id: slack-mcp
+        command: "mcp call slack.conversations.invite channel=C05678 users='U01234,U05678'"
+        output: '{ "channel": { "id": "C05678" } }'
+
+      - id: get-channel-history
+        name: 获取频道消息历史
+        status: supported
+        tool_id: slack-mcp
+        command: "mcp call slack.conversations.history channel=C01234 limit=50"
+        output: '{ "messages": [...], "has_more": false }'
+        notes: "结合 oldest/latest 参数可按时间范围过滤"
+
+      - id: archive-channel
+        name: 归档频道
+        status: supported
+        tool_id: slack-mcp
+        command: "mcp call slack.conversations.archive channel=C05678"
+        output: '{ "ok": true }'
+
+  - id: files
+    name: 文件
+    features:
+      - id: upload-file
+        name: 上传文件到频道
+        status: supported
+        tool_id: slack-mcp
+        command: "mcp call slack.files.upload channels=C01234 filename='report.pdf' content='<base64 or file path>'"
+        output: '{ "file": { "id": "F01234", "name": "report.pdf", "permalink": "https://..." } }'
+
+      - id: list-files
+        name: 列出频道文件
+        status: supported
+        tool_id: slack-mcp
+        command: "mcp call slack.files.list channel=C01234 count=20"
+        output: '{ "files": [...] }'
+
+      - id: delete-file
+        name: 删除文件
+        status: supported
+        tool_id: slack-mcp
+        command: "mcp call slack.files.delete file=F01234"
+        output: '{ "ok": true }'
+
+      - id: share-file
+        name: 分享文件到其他频道
+        status: partial
+        tool_id: slack-mcp
+        notes: "可将已上传文件的 permalink 发送到其他频道"
+        gap_reason: "无原生 share 接口，需重新上传或发链接"
+
+  - id: workflow
+    name: 工作流 / Workflow
+    features:
+      - id: trigger-workflow
+        name: 触发 Workflow（via Webhook）
+        status: supported
+        tool_id: slack-cli
+        command: "curl -X POST https://hooks.slack.com/triggers/xxx -H 'Content-Type: application/json' -d '{\"user_id\":\"U01234\"}'"
+        notes: "Slack Workflow Builder 生成 Webhook URL，可携带参数触发"
+        output: '{ "ok": true }'
+
+      - id: list-workflows
+        name: 查询 Workflow 列表
+        status: unsupported
+        gap_reason: "Workflow 列表仅 GUI 可查，API 不开放管理接口"
+
+      - id: create-reminder
+        name: 创建提醒（Reminder）
+        status: supported
+        tool_id: slack-mcp
+        command: "mcp call slack.reminders.add text='提交周报' time='2026-05-09T18:00:00Z' user=U01234"
+        output: '{ "reminder": { "id": "Rm01234", "text": "提交周报" } }'
+
+      - id: schedule-message
+        name: 定时发送消息
+        status: supported
+        tool_id: slack-mcp
+        command: "mcp call slack.chat.scheduleMessage channel=C01234 text='今日站会开始' post_at=1715000000"
+        output: '{ "scheduled_message_id": "Q01234" }'
+        notes: "post_at 为 Unix 时间戳（秒），最多提前 120 天"

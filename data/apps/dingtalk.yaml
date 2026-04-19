@@ -1,0 +1,200 @@
+id: dingtalk
+name: 钉钉
+description: 阿里巴巴出品的企业数字化平台，覆盖沟通、协作、审批、低代码应用等。
+homepage: https://www.dingtalk.com
+category: enterprise-collab
+
+tools:
+  - id: dingtalk-mcp
+    name: dingtalk-mcp（官方）
+    type: mcp
+    install_cmd: "npx @alicloud/dingtalk-mcp-server"
+    repo: https://github.com/open-dingtalk/dingtalk-agent-toolkit
+    maintained: official
+
+  - id: dingtalk-stream
+    name: dingtalk-stream（官方 SDK）
+    type: cli
+    install_cmd: "pip install dingtalk-stream"
+    repo: https://github.com/open-dingtalk/dingtalk-stream-sdk-python
+    maintained: official
+
+domains:
+  - id: messenger
+    name: 消息
+    features:
+      - id: send-text-message
+        name: 发送文字消息（单聊）
+        status: supported
+        tool_id: dingtalk-mcp
+        command: "mcp call dingtalk.im.message.send receiver_id=xxx receiver_type=user msg_type=text content='{\"content\":\"Hello\"}'"
+        input: |
+          receiver_id: 用户 unionId 或 staffId
+          msg_type: text / markdown / actionCard
+          content: 消息体 JSON
+        output: '{ "process_query_key": "xxx", "message_id": "msg_xxx" }'
+
+      - id: send-group-message
+        name: 发送消息到群组
+        status: supported
+        tool_id: dingtalk-mcp
+        command: "mcp call dingtalk.im.message.send receiver_id=grp_xxx receiver_type=openConversation msg_type=markdown content='{\"title\":\"通知\",\"text\":\"# 部署完成\\n服务已上线\"}'"
+        output: '{ "message_id": "msg_xxx" }'
+        notes: "需提前获取群的 openConversationId"
+
+      - id: send-robot-webhook
+        name: 通过机器人 Webhook 发消息
+        status: supported
+        tool_id: dingtalk-stream
+        command: "python -c \"import dingtalk_stream; # 使用 Webhook 推送\"\nOR: curl -X POST 'https://oapi.dingtalk.com/robot/send?access_token=xxx' -H 'Content-Type: application/json' -d '{\"msgtype\":\"text\",\"text\":{\"content\":\"Deploy done\"}}'"
+        notes: "Webhook 机器人最简单，无需 OAuth，适合 CI/CD 通知"
+        output: '{ "errcode": 0, "errmsg": "ok" }'
+
+      - id: recall-message
+        name: 撤回消息
+        status: unsupported
+        gap_reason: "钉钉 IM 消息 API 不支持撤回，仅 App 内可手动操作"
+
+      - id: get-unread-count
+        name: 获取未读消息数
+        status: unsupported
+        gap_reason: "未读数量属于个人隐私数据，API 不开放"
+
+  - id: calendar
+    name: 日历
+    features:
+      - id: create-event
+        name: 创建日程
+        status: supported
+        tool_id: dingtalk-mcp
+        command: "mcp call dingtalk.calendar.event.create union_id=xxx summary='周会' start='{\"dateTime\":\"2026-05-10T10:00:00+08:00\"}' end='{\"dateTime\":\"2026-05-10T11:00:00+08:00\"}'"
+        input: |
+          summary: 日程标题
+          start / end: RFC3339 时间（含时区）
+        output: '{ "id": "evt_xxx", "organizer": { "unionId": "xxx" } }'
+
+      - id: list-events
+        name: 查询日程列表
+        status: supported
+        tool_id: dingtalk-mcp
+        command: "mcp call dingtalk.calendar.event.list union_id=xxx calendar_id=primary time_min='2026-05-01T00:00:00+08:00' time_max='2026-05-31T23:59:59+08:00'"
+        output: '{ "events": [...] }'
+
+      - id: delete-event
+        name: 删除日程
+        status: supported
+        tool_id: dingtalk-mcp
+        command: "mcp call dingtalk.calendar.event.delete union_id=xxx calendar_id=primary event_id=evt_xxx"
+        output: '{}'
+
+      - id: book-conference-room
+        name: 预约会议室
+        status: partial
+        tool_id: dingtalk-mcp
+        notes: "可通过 attendees 添加会议室资源账号实现预约"
+        gap_reason: "无独立预约接口，需先查询会议室 ID，步骤繁琐"
+
+  - id: docs
+    name: 文档（钉钉文档）
+    features:
+      - id: create-doc
+        name: 创建文档
+        status: supported
+        tool_id: dingtalk-mcp
+        command: "mcp call dingtalk.doc.create name='会议纪要' space_id=xxx"
+        output: '{ "doc_key": "xxx", "url": "https://alidocs.dingtalk.com/..." }'
+
+      - id: read-doc
+        name: 读取文档内容
+        status: partial
+        tool_id: dingtalk-mcp
+        command: "mcp call dingtalk.doc.content.get doc_key=xxx"
+        notes: "返回结构化内容，但富文本格式支持有限"
+        gap_reason: "表格、嵌入组件等复杂格式无法完整导出"
+
+      - id: share-doc
+        name: 分享文档
+        status: supported
+        tool_id: dingtalk-mcp
+        command: "mcp call dingtalk.doc.share.create doc_key=xxx share_type=anyone_read"
+        output: '{ "share_url": "https://alidocs.dingtalk.com/share/..." }'
+
+      - id: doc-version
+        name: 查看版本历史
+        status: unsupported
+        gap_reason: "版本历史仅 GUI 可访问，API 未开放"
+
+  - id: approval
+    name: 审批
+    features:
+      - id: create-approval
+        name: 发起审批
+        status: supported
+        tool_id: dingtalk-mcp
+        command: "mcp call dingtalk.approval.instance.create process_code=PROC-xxx originator_user_id=xxx form_component_values='[{\"name\":\"请假天数\",\"value\":\"3\"}]'"
+        input: |
+          process_code: 审批模板 code（管理员创建）
+          originator_user_id: 发起人 userId
+          form_component_values: 表单字段数组
+        output: '{ "instance_id": "xxxxx" }'
+
+      - id: get-approval-detail
+        name: 查询审批详情
+        status: supported
+        tool_id: dingtalk-mcp
+        command: "mcp call dingtalk.approval.instance.get instance_id=xxxxx"
+        output: |
+          {
+            "status": "RUNNING",
+            "result": null,
+            "form_component_values": [...],
+            "tasks": [{ "task_status": "PENDING", "approver_user_id": "yyy" }]
+          }
+
+      - id: list-approvals
+        name: 批量查询审批实例
+        status: supported
+        tool_id: dingtalk-mcp
+        command: "mcp call dingtalk.approval.instance.list process_code=PROC-xxx start_time=1746057600000 end_time=1748736000000"
+        output: '{ "list": ["instance_1", "instance_2"], "next_token": "xxx" }'
+
+      - id: cancel-approval
+        name: 撤销审批
+        status: supported
+        tool_id: dingtalk-mcp
+        command: "mcp call dingtalk.approval.instance.terminate instance_id=xxxxx is_system=false remark='申请有误'"
+        output: '{}'
+
+  - id: todo
+    name: 待办
+    features:
+      - id: create-todo
+        name: 创建待办
+        status: supported
+        tool_id: dingtalk-mcp
+        command: "mcp call dingtalk.todo.task.create union_id=xxx subject='提交周报' due_time=1746316800000"
+        input: |
+          subject: 待办标题
+          due_time: 截止时间（毫秒时间戳）
+        output: '{ "id": "task_xxx" }'
+
+      - id: complete-todo
+        name: 完成待办
+        status: supported
+        tool_id: dingtalk-mcp
+        command: "mcp call dingtalk.todo.task.update task_id=task_xxx union_id=xxx done=true"
+        output: '{}'
+
+      - id: list-todos
+        name: 查询待办列表
+        status: supported
+        tool_id: dingtalk-mcp
+        command: "mcp call dingtalk.todo.task.list union_id=xxx is_done=false"
+        output: '{ "tasks": [...], "next_token": "xxx" }'
+
+      - id: assign-todo
+        name: 指派待办给他人
+        status: partial
+        tool_id: dingtalk-mcp
+        notes: "创建时可指定 executor_ids，但无法修改已创建任务的执行人"
+        gap_reason: "update 接口不支持修改 executor_ids"

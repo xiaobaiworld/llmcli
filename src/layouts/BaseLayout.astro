@@ -2,23 +2,45 @@
 interface Props {
   title: string;
   description?: string;
+  /** Canonical URL for this page (used for og:url) */
+  canonicalPath?: string;
 }
 const {
   title,
-  description = 'CLI tools rated for AI agent use. Find agent-ready command-line tools with agent-ready scores.',
+  description = 'AI agent 应用操作手册——告诉你飞书、GitHub、Notion 等每个功能能不能通过 CLI/MCP 工具自动化，支持的给命令示例，不支持的说明原因。',
+  canonicalPath = '',
 } = Astro.props;
+
+const siteUrl = 'https://shellnav.com';
+const canonicalUrl = `${siteUrl}${canonicalPath}`;
 ---
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+    <link rel="sitemap" href="/sitemap.xml" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <!-- Google Search Console 验证 -->
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="shellnav" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+
+    <!-- Google Search Console -->
     <meta name="google-site-verification" content="dNPE4tu3bN9Jq55P1B69YoTtNFS-7z9-BNBpUtne1GY" />
+
     <!-- Google Analytics GA4 -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-DLGJDH7H4N"></script>
     <script>
@@ -28,23 +50,38 @@ const {
       gtag('config', 'G-DLGJDH7H4N');
     </script>
   </head>
+
   <body class="bg-white text-gray-900 antialiased min-h-screen flex flex-col">
+
+    <!-- ── Header ── -->
     <header class="border-b border-gray-200 sticky top-0 bg-white/95 backdrop-blur z-10">
       <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-        <a href="/" class="flex items-center gap-2 no-underline group">
+        <!-- Logo -->
+        <a href="/" class="flex items-center gap-2 no-underline group shrink-0">
           <span class="font-mono font-bold text-lg text-gray-900 group-hover:text-green-600 transition-colors">
-            llmcli
+            shellnav
           </span>
-          <span class="text-gray-400 text-sm hidden sm:inline">CLI tools for AI agents</span>
+          <span class="text-gray-400 text-xs hidden sm:inline">AI agent 应用手册</span>
         </a>
-        <nav class="flex items-center gap-4 text-sm">
+
+        <!-- Nav links -->
+        <nav class="flex items-center gap-1 text-sm">
+          <a href="/" class="px-3 py-1.5 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors">
+            应用手册
+          </a>
+          <a href="/tools" class="px-3 py-1.5 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors">
+            CLI 工具
+          </a>
           <a
-            href="https://github.com/your-org/llmcli"
-            class="text-gray-500 hover:text-gray-900 transition-colors"
+            href="https://github.com/xiaobaiworld/llmcli"
+            class="px-3 py-1.5 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors flex items-center gap-1"
             target="_blank"
             rel="noopener"
           >
-            GitHub
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.741 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
+            </svg>
+            <span class="hidden sm:inline">GitHub</span>
           </a>
         </nav>
       </div>
@@ -54,25 +91,30 @@ const {
       <slot />
     </main>
 
+    <!-- ── Footer ── -->
     <footer class="border-t border-gray-200 mt-16">
-      <div class="max-w-6xl mx-auto px-4 py-8 text-center text-sm text-gray-400">
-        <p>
-          llmcli — CLI tools, rated for AI agent use.
-        </p>
-        <p class="mt-1">
-          Data:
-          <a href="/data/tools.seed.yaml" class="underline hover:text-gray-600">tools.seed.yaml</a>
-          &middot;
-          <a
-            href="https://github.com/your-org/llmcli"
-            class="underline hover:text-gray-600"
-            target="_blank"
-            rel="noopener"
-          >
-            Contribute on GitHub
-          </a>
-        </p>
+      <div class="max-w-6xl mx-auto px-4 py-8">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-400">
+          <p>
+            <span class="font-mono font-semibold text-gray-600">shellnav.com</span>
+            &nbsp;— AI agent 应用操作手册
+          </p>
+          <div class="flex gap-4">
+            <a href="/sitemap.xml" class="hover:text-gray-600 transition-colors">Sitemap</a>
+            <a
+              href="https://github.com/xiaobaiworld/llmcli/blob/main/CONTRIBUTING.md"
+              class="hover:text-gray-600 transition-colors"
+              target="_blank" rel="noopener"
+            >贡献数据</a>
+            <a
+              href="https://github.com/xiaobaiworld/llmcli"
+              class="hover:text-gray-600 transition-colors"
+              target="_blank" rel="noopener"
+            >GitHub</a>
+          </div>
+        </div>
       </div>
     </footer>
+
   </body>
 </html>

@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.3.0] — 2026-04-19 — Phase 3: 内容扩展 + 部署上线
+
+### 新增
+- `data/apps/github.yaml`：GitHub 覆盖矩阵（6 域 22 功能，工具：gh CLI + github-mcp-server）
+- `data/apps/notion.yaml`：Notion 覆盖矩阵（4 域 16 功能，工具：notion-mcp-server）
+- `data/apps/feishu.yaml`：补充审批（5）/ HR 假期（4）/ OKR（5）三域
+- `src/pages/tools.astro`：独立通用 CLI 工具目录页（/tools）
+- `CONTRIBUTING.md`：社区贡献指南（YAML 格式说明 + PR 流程）
+- 首页「贡献数据」GitHub 按钮
+- `public/sitemap.xml`：更新至 57 URLs
+
+### 部署
+- 上线域名：https://shellnav.com（Vercel + Spaceship DNS）
+- GA4 接入（G-DLGJDH7H4N）
+- Google Search Console meta 验证已部署
+
+### 构建结果
+- 57 个页面，Pagefind 索引 55 页 / 1665 词
+- `data/apps/` 现覆盖 5 个应用（飞书/企业微信/Obsidian/GitHub/Notion），共约 130 个功能点
+
+---
+
 ## [0.2.0] — 2026-04-16 — Phase 2: App 覆盖矩阵
 
 ### 新增

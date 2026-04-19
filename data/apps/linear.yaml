@@ -1,0 +1,157 @@
+id: linear
+name: Linear
+description: 面向工程团队的现代项目管理工具，以速度和简洁著称，原生支持 MCP。
+homepage: https://linear.app
+category: project
+
+tools:
+  - id: linear-mcp
+    name: linear-mcp-server（官方）
+    type: mcp
+    install_cmd: "npx linear-mcp-server"
+    repo: https://github.com/linear/linear-mcp
+    maintained: official
+
+domains:
+  - id: issues
+    name: Issue
+    features:
+      - id: create-issue
+        name: 创建 Issue
+        status: supported
+        tool_id: linear-mcp
+        command: "mcp call linear.issues.create title='Fix auth bug' description='登录时偶发 500' teamId=TEAM_xxx priority=2"
+        input: |
+          title: Issue 标题
+          description: 详情（Markdown）
+          teamId: 团队 ID
+          priority: 0=无 1=紧急 2=高 3=中 4=低
+        output: '{ "issue": { "id": "ISS-123", "identifier": "ENG-123", "url": "https://linear.app/..." } }'
+
+      - id: update-issue
+        name: 更新 Issue 状态/属性
+        status: supported
+        tool_id: linear-mcp
+        command: "mcp call linear.issues.update id=ISS-123 stateId=STATE_done assigneeId=USER_xxx"
+        output: '{ "issue": { "id": "ISS-123", "state": { "name": "Done" } } }'
+        notes: "stateId 需先通过 linear.workflowStates.list 获取"
+
+      - id: list-issues
+        name: 查询 Issue 列表（过滤）
+        status: supported
+        tool_id: linear-mcp
+        command: "mcp call linear.issues.list filter='{\"assignee\":{\"me\":{\"eq\":true}},\"state\":{\"type\":{\"neq\":\"completed\"}}}' orderBy=priority"
+        output: '{ "nodes": [{ "id": "ISS-123", "title": "Fix auth bug", "priority": 2 }] }'
+        notes: "filter 支持丰富的嵌套条件，几乎可以模拟所有视图"
+
+      - id: search-issues
+        name: 全文搜索 Issue
+        status: supported
+        tool_id: linear-mcp
+        command: "mcp call linear.issueSearch query='auth 500' teamId=TEAM_xxx"
+        output: '{ "nodes": [...] }'
+
+      - id: delete-issue
+        name: 删除 Issue
+        status: supported
+        tool_id: linear-mcp
+        command: "mcp call linear.issues.delete id=ISS-123"
+        output: '{ "success": true }'
+
+      - id: add-label
+        name: 给 Issue 添加标签
+        status: supported
+        tool_id: linear-mcp
+        command: "mcp call linear.issues.update id=ISS-123 labelIds='[\"LABEL_bug\",\"LABEL_p1\"]'"
+        output: '{ "issue": { "labels": { "nodes": [...] } } }'
+
+  - id: projects
+    name: Project
+    features:
+      - id: create-project
+        name: 创建项目
+        status: supported
+        tool_id: linear-mcp
+        command: "mcp call linear.projects.create name='Q2 Roadmap' teamIds='[\"TEAM_xxx\"]' description='Q2 核心功能规划'"
+        output: '{ "project": { "id": "PROJ_xxx", "name": "Q2 Roadmap", "url": "https://linear.app/..." } }'
+
+      - id: list-projects
+        name: 查询项目列表
+        status: supported
+        tool_id: linear-mcp
+        command: "mcp call linear.projects.list filter='{\"state\":{\"eq\":\"started\"}}'"
+        output: '{ "nodes": [{ "id": "PROJ_xxx", "name": "Q2 Roadmap", "progress": 0.42 }] }'
+
+      - id: update-project-status
+        name: 更新项目状态
+        status: supported
+        tool_id: linear-mcp
+        command: "mcp call linear.projects.update id=PROJ_xxx state=completed"
+        output: '{ "project": { "id": "PROJ_xxx", "state": "completed" } }'
+
+      - id: add-issue-to-project
+        name: 将 Issue 关联到项目
+        status: supported
+        tool_id: linear-mcp
+        command: "mcp call linear.issues.update id=ISS-123 projectId=PROJ_xxx"
+        output: '{ "issue": { "project": { "id": "PROJ_xxx" } } }'
+
+  - id: cycles
+    name: Cycle（Sprint）
+    features:
+      - id: create-cycle
+        name: 创建 Cycle
+        status: supported
+        tool_id: linear-mcp
+        command: "mcp call linear.cycles.create teamId=TEAM_xxx name='Sprint 42' startsAt='2026-05-01' endsAt='2026-05-14'"
+        output: '{ "cycle": { "id": "CYC_xxx", "number": 42 } }'
+
+      - id: list-cycles
+        name: 查询 Cycle 列表
+        status: supported
+        tool_id: linear-mcp
+        command: "mcp call linear.cycles.list teamId=TEAM_xxx filter='{\"isActive\":{\"eq\":true}}'"
+        output: '{ "nodes": [{ "id": "CYC_xxx", "name": "Sprint 42", "progress": 0.6 }] }'
+
+      - id: add-issue-to-cycle
+        name: 将 Issue 加入 Cycle
+        status: supported
+        tool_id: linear-mcp
+        command: "mcp call linear.issues.update id=ISS-123 cycleId=CYC_xxx"
+        output: '{ "issue": { "cycle": { "id": "CYC_xxx" } } }'
+
+      - id: cycle-burndown
+        name: 查看 Cycle 燃尽图数据
+        status: unsupported
+        gap_reason: "燃尽图为计算型视图，API 仅返回原始 issue 列表，需客户端自行计算"
+
+  - id: comments
+    name: 评论
+    features:
+      - id: add-comment
+        name: 添加评论
+        status: supported
+        tool_id: linear-mcp
+        command: "mcp call linear.comments.create issueId=ISS-123 body='已在 staging 复现，根因是 token 过期未刷新'"
+        output: '{ "comment": { "id": "CMT_xxx", "createdAt": "..." } }'
+
+      - id: list-comments
+        name: 获取 Issue 评论列表
+        status: supported
+        tool_id: linear-mcp
+        command: "mcp call linear.comments.list filter='{\"issue\":{\"id\":{\"eq\":\"ISS-123\"}}}'"
+        output: '{ "nodes": [{ "id": "CMT_xxx", "body": "已在 staging 复现..." }] }'
+
+      - id: update-comment
+        name: 编辑评论
+        status: supported
+        tool_id: linear-mcp
+        command: "mcp call linear.comments.update id=CMT_xxx body='（更新）根因已定位，PR #55 修复中'"
+        output: '{ "comment": { "id": "CMT_xxx" } }'
+
+      - id: delete-comment
+        name: 删除评论
+        status: supported
+        tool_id: linear-mcp
+        command: "mcp call linear.comments.delete id=CMT_xxx"
+        output: '{ "success": true }'

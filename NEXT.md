@@ -1,53 +1,44 @@
-# Phase 3 — 内容扩展 + 搜索增强
+# Phase 4 — 導航完善 + 新 App + SEO 打磨
 
-> 目标：补全飞书域覆盖、新增 GitHub/Notion、优化全文搜索体验
-> 参考：docs/DEV.md（Phase 3 规划）
+> 目標：補齊導航缺口、新增釘釘/Slack/Linear、強化 OG/SEO、修正 footer
 
 ---
 
-## 步骤清单
+## 步驟清單
 
-### Step 1：飞书补全
-- [ ] 在 `data/apps/feishu.yaml` 补充以下域：
-  - 审批（approval）：发起审批、查询审批状态
-  - HR 假期（hr-leave）：查询假期余额、提交请假
-  - OKR：创建 OKR、查询进度
+### Step 1：導航欄改版
+- [ ] `BaseLayout.astro` nav 加入「應用手冊」和「CLI 工具」兩個入口
+- [ ] footer 更新：域名改為 shellnav.com、sitemap 鏈接、貢獻鏈接
 
-### Step 2：新增 GitHub 数据
-- [ ] 创建 `data/apps/github.yaml`
-  - 工具：gh CLI（官方）+ github-mcp-server（官方）
-  - 域：Issue、PR、Actions、Releases、代码搜索、通知
+### Step 2：Open Graph + SEO meta
+- [ ] `BaseLayout.astro` 加 og:title / og:description / og:url / og:type
+- [ ] 詳情頁傳入頁面級 og:description
 
-### Step 3：新增 Notion 数据
-- [ ] 创建 `data/apps/notion.yaml`
-  - 工具：notion-mcp-server（官方）
-  - 域：页面管理、数据库、搜索、评论
+### Step 3：新增釘釘數據
+- [ ] 創建 `data/apps/dingtalk.yaml`
+  - 工具：dingtalk-mcp（官方）
+  - 域：消息、日曆、文檔、審批、待辦
 
-### Step 4：工具详情页入口（旧工具目录）
-- [ ] 将首页 "浏览通用 CLI 工具" 链接指向实际可用的 `/tools` 页
-  - 当前 href="/tools" 但该路由不存在（旧首页在 `/`）
-  - 方案 A：新建 `src/pages/tools.astro`（重用旧 index.astro 逻辑）
-  - 方案 B：保留 `/` 旧首页，新首页改为 `/apps`
+### Step 4：新增 Slack 數據
+- [ ] 創建 `data/apps/slack.yaml`
+  - 工具：slack-mcp-server（官方 MCP）
+  - 域：消息、頻道、文件、工作流
 
-### Step 5：搜索体验优化
-- [ ] 确认 App 详情页 `data-pagefind-body` 标记被 Pagefind 正确索引
-- [ ] 在首页搜索结果中区分「应用功能」和「CLI 工具」两类结果
+### Step 5：新增 Linear 數據
+- [ ] 創建 `data/apps/linear.yaml`
+  - 工具：linear-mcp-server（官方）
+  - 域：Issue、Project、Cycle、Comment
 
-### Step 6：贡献指南
-- [ ] 创建 `CONTRIBUTING.md`（如何贡献新 App / 新工具）
-- [ ] 在首页底部加「贡献数据」按钮（指向 GitHub PR）
-
-### Step 7：构建 + 提交
-- [ ] `npm run build` 零错误
-- [ ] `git commit -m "feat: phase 3 — content expansion"`
-- [ ] `git push origin main`
+### Step 6：Build + commit + deploy
+- [ ] `npm run build` 零錯誤
+- [ ] 更新 sitemap（新增 3 個 app 頁）
+- [ ] `git commit` + `git push` + `vercel deploy --prod`
 - [ ] 更新 CHANGELOG.md
-- [ ] 清空本文件，写 Phase 4 NEXT.md
+- [ ] 清空本文件，寫 Phase 5 NEXT.md
 
 ---
 
-## 当前进度
+## 當前進度
 
-- [x] Phase 1 完成（Astro 基础框架 + 50 工具）
-- [x] Phase 2 完成（App 覆盖矩阵：飞书/企业微信/Obsidian）
-- [ ] Step 1–7 待执行
+- [x] Phase 1–3 已完成（5 個 App，57 頁，shellnav.com 上線）
+- [ ] Step 1–6 待執行
