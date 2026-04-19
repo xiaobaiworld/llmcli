@@ -1,0 +1,236 @@
+id: github
+name: GitHub
+description: 全球最大的代码托管与协作平台，覆盖 Issue、PR、Actions、Releases 等全研发生命周期。
+homepage: https://github.com
+category: devtools
+
+tools:
+  - id: gh-cli
+    name: gh CLI
+    type: cli
+    install_cmd: "brew install gh"
+    repo: https://github.com/cli/cli
+    maintained: official
+
+  - id: github-mcp
+    name: github-mcp-server
+    type: mcp
+    install_cmd: "npx @modelcontextprotocol/server-github"
+    repo: https://github.com/modelcontextprotocol/servers/tree/main/src/github
+    maintained: official
+
+domains:
+  - id: issues
+    name: Issue
+    features:
+      - id: create-issue
+        name: 创建 Issue
+        status: supported
+        tool_id: gh-cli
+        command: "gh issue create --title 'Bug: login fails' --body '## 描述\n登录时报 500' --label bug --assignee @me"
+        input: |
+          --title: Issue 标题
+          --body: 描述（支持 Markdown）
+          --label: 标签（可多个）
+          --assignee: 指派人
+        output: |
+          https://github.com/owner/repo/issues/42
+
+      - id: list-issues
+        name: 查询 Issue 列表
+        status: supported
+        tool_id: gh-cli
+        command: "gh issue list --state open --label bug --json number,title,assignees,createdAt"
+        output: '[{ "number": 42, "title": "Bug: login fails", "assignees": [...] }]'
+        notes: "--json 输出机器可读，适合 agent 处理"
+
+      - id: close-issue
+        name: 关闭 Issue
+        status: supported
+        tool_id: gh-cli
+        command: "gh issue close 42 --comment 'Fixed in #45'"
+        output: "Issue #42 closed"
+
+      - id: comment-issue
+        name: 添加 Issue 评论
+        status: supported
+        tool_id: gh-cli
+        command: "gh issue comment 42 --body 'Reproduced on v2.3.1'"
+        output: "https://github.com/owner/repo/issues/42#issuecomment-xxx"
+
+      - id: bulk-close-issues
+        name: 批量关闭 Issue
+        status: partial
+        tool_id: gh-cli
+        command: "gh issue list --label stale --json number -q '.[].number' | xargs -I{} gh issue close {}"
+        notes: "组合 gh + xargs 可批量操作，但速率受 API 限制"
+        gap_reason: "无原生批量操作命令，需脚本组合"
+
+  - id: pull-requests
+    name: Pull Request
+    features:
+      - id: create-pr
+        name: 创建 PR
+        status: supported
+        tool_id: gh-cli
+        command: "gh pr create --title 'feat: add GA4 tracking' --body '## 改动\n注入 gtag.js' --base main --head feat/ga4"
+        output: "https://github.com/owner/repo/pull/55"
+
+      - id: view-pr
+        name: 查看 PR 详情 + diff
+        status: supported
+        tool_id: gh-cli
+        command: "gh pr view 55 --json title,body,additions,deletions,files,reviews"
+        output: '{ "title": "feat: add GA4 tracking", "additions": 12, "deletions": 1, "files": [...] }'
+
+      - id: review-pr
+        name: 提交 PR Review
+        status: supported
+        tool_id: gh-cli
+        command: "gh pr review 55 --approve --body 'LGTM'"
+        output: "Approved pull request #55"
+        notes: "支持 --approve / --request-changes / --comment 三种 review 类型"
+
+      - id: merge-pr
+        name: 合并 PR
+        status: supported
+        tool_id: gh-cli
+        command: "gh pr merge 55 --squash --delete-branch"
+        output: "Merged pull request #55"
+
+      - id: pr-checks
+        name: 查看 CI 检查状态
+        status: supported
+        tool_id: gh-cli
+        command: "gh pr checks 55 --json name,state,conclusion"
+        output: '[{ "name": "build", "state": "completed", "conclusion": "success" }]'
+
+  - id: actions
+    name: GitHub Actions
+    features:
+      - id: list-workflows
+        name: 查询 Workflow 列表
+        status: supported
+        tool_id: gh-cli
+        command: "gh workflow list --json id,name,state"
+        output: '[{ "id": 12345, "name": "CI", "state": "active" }]'
+
+      - id: trigger-workflow
+        name: 手动触发 Workflow
+        status: supported
+        tool_id: gh-cli
+        command: "gh workflow run ci.yml --ref main --field environment=staging"
+        output: "Created workflow_dispatch event for ci.yml"
+
+      - id: view-run-logs
+        name: 查看运行日志
+        status: supported
+        tool_id: gh-cli
+        command: "gh run view 9876543 --log"
+        output: "（完整日志文本，适合 agent 做错误摘要）"
+        notes: "日志量大时建议加 --log-failed 只看失败步骤"
+
+      - id: cancel-run
+        name: 取消正在运行的 Workflow
+        status: supported
+        tool_id: gh-cli
+        command: "gh run cancel 9876543"
+        output: "✓ Requested cancellation of run 9876543"
+
+      - id: rerun-failed
+        name: 重跑失败的 Job
+        status: supported
+        tool_id: gh-cli
+        command: "gh run rerun 9876543 --failed"
+        output: "✓ Requested rerun of failed jobs for run 9876543"
+
+      - id: secret-management
+        name: 管理 Actions Secrets
+        status: partial
+        tool_id: gh-cli
+        command: "gh secret set MY_TOKEN --body 'xxx'"
+        notes: "可以设置/删除 Secret，但无法读取 Secret 值（安全限制）"
+        gap_reason: "Secret 值读取不开放，符合安全设计"
+
+  - id: releases
+    name: Releases
+    features:
+      - id: create-release
+        name: 创建 Release
+        status: supported
+        tool_id: gh-cli
+        command: "gh release create v1.2.0 --title 'v1.2.0' --notes '## 新功能\n- App 覆盖矩阵' dist/*.tar.gz"
+        input: |
+          tag: 版本号（如 v1.2.0）
+          --notes: Release 说明（Markdown）
+          files: 附件（可选）
+        output: "https://github.com/owner/repo/releases/tag/v1.2.0"
+
+      - id: list-releases
+        name: 查询 Release 列表
+        status: supported
+        tool_id: gh-cli
+        command: "gh release list --json tagName,publishedAt,isLatest"
+        output: '[{ "tagName": "v1.2.0", "isLatest": true }]'
+
+      - id: download-release-asset
+        name: 下载 Release 附件
+        status: supported
+        tool_id: gh-cli
+        command: "gh release download v1.2.0 --pattern '*.tar.gz' --dir ./downloads"
+        output: "Downloaded dist-v1.2.0.tar.gz to ./downloads"
+
+      - id: delete-release
+        name: 删除 Release
+        status: supported
+        tool_id: gh-cli
+        command: "gh release delete v1.2.0 --yes"
+        output: "✓ Deleted release v1.2.0"
+
+  - id: code-search
+    name: 代码搜索
+    features:
+      - id: search-code
+        name: 全局代码搜索
+        status: supported
+        tool_id: gh-cli
+        command: "gh search code 'getStaticPaths' --repo owner/repo --json path,textMatches"
+        output: '[{ "path": "src/pages/app/[id].astro", "textMatches": [...] }]'
+
+      - id: search-repos
+        name: 搜索仓库
+        status: supported
+        tool_id: gh-cli
+        command: "gh search repos 'mcp server' --language typescript --sort stars --json fullName,stargazersCount"
+        output: '[{ "fullName": "modelcontextprotocol/servers", "stargazersCount": 8200 }]'
+
+      - id: search-commits
+        name: 搜索 Commit
+        status: supported
+        tool_id: gh-cli
+        command: "gh search commits 'fix: auth bug' --repo owner/repo --json sha,message,author"
+        output: '[{ "sha": "abc123", "message": "fix: auth bug in login flow" }]'
+
+  - id: notifications
+    name: 通知
+    features:
+      - id: list-notifications
+        name: 查询未读通知
+        status: supported
+        tool_id: github-mcp
+        command: "mcp call notifications.list all=false"
+        output: '[{ "id": "xxx", "subject": { "title": "PR #55 merged", "type": "PullRequest" } }]'
+
+      - id: mark-read
+        name: 标记通知为已读
+        status: supported
+        tool_id: github-mcp
+        command: "mcp call notifications.mark_read thread_id=xxx"
+        output: '{ "status": "ok" }'
+
+      - id: subscribe-repo
+        name: 订阅/取消订阅仓库通知
+        status: partial
+        tool_id: github-mcp
+        notes: "可通过 API 设置 subscription，但 CLI 无直接命令"
+        gap_reason: "gh CLI 未内置 subscription 管理，需用 API 调用"

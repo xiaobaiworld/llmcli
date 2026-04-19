@@ -1,0 +1,151 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ToolCard from '../components/ToolCard.astro';
+import { getTools, CATEGORY_LABELS, KIND_LABELS } from '../lib/tools';
+
+const tools = getTools();
+const categories = ['file-text', 'http-api', 'data-db', 'dev-code', 'ops', 'llm-agent'] as const;
+const kinds = ['traditional-cli', 'ai-native-cli', 'mcp-server'] as const;
+const highCount = tools.filter(t => t.agent_ready_level === 'high').length;
+---
+
+<BaseLayout title="通用 CLI 工具目录 — llmcli" description="50+ 通用 CLI 工具，按 AI agent 可用性评分。">
+  <!-- Hero -->
+  <div class="bg-gray-50 border-b border-gray-200">
+    <div class="max-w-6xl mx-auto px-4 py-10">
+      <div class="max-w-2xl">
+        <a href="/" class="text-sm text-gray-400 hover:text-gray-700 transition-colors inline-flex items-center gap-1 mb-4">
+          ← 返回应用手册
+        </a>
+        <h1 class="text-3xl font-bold text-gray-900 mb-3">通用 CLI 工具目录</h1>
+        <p class="text-gray-600 text-base mb-6 leading-relaxed">
+          每个工具按非交互性、机器可读输出、退出码可预测性打分，帮你快速找到 agent 能直接调用的工具。
+        </p>
+        <div class="flex flex-wrap gap-6 text-sm text-gray-500">
+          <span><strong class="text-gray-900 font-semibold">{tools.length}</strong> 个工具</span>
+          <span><strong class="text-gray-900 font-semibold">{categories.length}</strong> 个分类</span>
+          <span><strong class="text-green-600 font-semibold">{highCount}</strong> 个 Agent-Ready High</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-6xl mx-auto px-4 py-8">
+    <!-- Pagefind search -->
+    <div class="mb-8">
+      <div id="search" class="max-w-xl"></div>
+    </div>
+
+    <!-- Filter bar -->
+    <div class="mb-6 space-y-3 pb-4 border-b border-gray-100">
+      <div class="flex flex-wrap gap-2 items-center">
+        <span class="text-xs font-medium text-gray-400 w-20 shrink-0">Category</span>
+        <button class="filter-btn text-xs px-3 py-1.5 rounded-full border font-medium bg-gray-900 text-white border-gray-900" data-filter-type="category" data-filter-value="all">All</button>
+        {categories.map(cat => (
+          <button class="filter-btn text-xs px-3 py-1.5 rounded-full border border-gray-200 text-gray-600 hover:border-gray-400 font-medium transition-colors" data-filter-type="category" data-filter-value={cat}>{CATEGORY_LABELS[cat]}</button>
+        ))}
+      </div>
+      <div class="flex flex-wrap gap-2 items-center">
+        <span class="text-xs font-medium text-gray-400 w-20 shrink-0">Kind</span>
+        <button class="filter-btn text-xs px-3 py-1.5 rounded-full border font-medium bg-gray-900 text-white border-gray-900" data-filter-type="kind" data-filter-value="all">All</button>
+        {kinds.map(kind => (
+          <button class="filter-btn text-xs px-3 py-1.5 rounded-full border border-gray-200 text-gray-600 hover:border-gray-400 font-medium transition-colors" data-filter-type="kind" data-filter-value={kind}>{KIND_LABELS[kind]}</button>
+        ))}
+      </div>
+      <div class="flex flex-wrap gap-2 items-center">
+        <span class="text-xs font-medium text-gray-400 w-20 shrink-0">Agent</span>
+        <button class="filter-btn text-xs px-3 py-1.5 rounded-full border font-medium bg-gray-900 text-white border-gray-900" data-filter-type="level" data-filter-value="all">All</button>
+        <button class="filter-btn text-xs px-3 py-1.5 rounded-full border border-gray-200 text-green-700 hover:border-green-300 font-medium transition-colors" data-filter-type="level" data-filter-value="high">High</button>
+        <button class="filter-btn text-xs px-3 py-1.5 rounded-full border border-gray-200 text-amber-700 hover:border-amber-300 font-medium transition-colors" data-filter-type="level" data-filter-value="medium">Medium</button>
+        <button class="filter-btn text-xs px-3 py-1.5 rounded-full border border-gray-200 text-red-700 hover:border-red-300 font-medium transition-colors" data-filter-type="level" data-filter-value="low">Low</button>
+      </div>
+    </div>
+
+    <p class="text-sm text-gray-400 mb-4">
+      Showing <strong id="tool-count" class="text-gray-700">{tools.length} tools</strong>
+    </p>
+
+    <div id="tool-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {tools.map(tool => <ToolCard tool={tool} />)}
+    </div>
+
+    <div id="empty-state" class="hidden text-center py-16 text-gray-400">
+      <p class="text-lg">No tools match these filters.</p>
+      <button id="reset-filters" class="mt-3 text-sm text-blue-600 hover:underline">Reset filters</button>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  const state: Record<string, string> = { category: 'all', kind: 'all', level: 'all' };
+  function applyFilters() {
+    const cards = document.querySelectorAll<HTMLElement>('[data-tool-id]');
+    let visible = 0;
+    cards.forEach(card => {
+      const match =
+        (state.category === 'all' || card.dataset.category === state.category) &&
+        (state.kind === 'all' || card.dataset.kind === state.kind) &&
+        (state.level === 'all' || card.dataset.level === state.level);
+      card.style.display = match ? '' : 'none';
+      if (match) visible++;
+    });
+    const countEl = document.getElementById('tool-count');
+    if (countEl) countEl.textContent = `${visible} tool${visible !== 1 ? 's' : ''}`;
+    const emptyState = document.getElementById('empty-state');
+    const grid = document.getElementById('tool-grid');
+    if (emptyState && grid) {
+      emptyState.classList.toggle('hidden', visible > 0);
+      grid.classList.toggle('hidden', visible === 0);
+    }
+  }
+  document.querySelectorAll<HTMLElement>('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const type = btn.dataset.filterType!;
+      const value = btn.dataset.filterValue!;
+      state[type] = value;
+      document.querySelectorAll<HTMLElement>(`[data-filter-type="${type}"]`).forEach(b => {
+        const isActive = b.dataset.filterValue === value;
+        b.classList.toggle('bg-gray-900', isActive);
+        b.classList.toggle('text-white', isActive);
+        b.classList.toggle('border-gray-900', isActive);
+        b.classList.toggle('text-gray-600', !isActive && b.dataset.filterValue !== 'all');
+        b.classList.toggle('border-gray-200', !isActive);
+      });
+      applyFilters();
+    });
+  });
+  document.getElementById('reset-filters')?.addEventListener('click', () => {
+    Object.keys(state).forEach(k => (state[k] = 'all'));
+    document.querySelectorAll<HTMLElement>('.filter-btn').forEach(btn => {
+      const isAll = btn.dataset.filterValue === 'all';
+      btn.classList.toggle('bg-gray-900', isAll);
+      btn.classList.toggle('text-white', isAll);
+      btn.classList.toggle('border-gray-900', isAll);
+      btn.classList.toggle('border-gray-200', !isAll);
+    });
+    applyFilters();
+  });
+</script>
+
+<script>
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = '/pagefind/pagefind-ui.css';
+  document.head.appendChild(link);
+  const script = document.createElement('script');
+  script.src = '/pagefind/pagefind-ui.js';
+  script.onload = () => {
+    // @ts-ignore
+    new PagefindUI({ element: '#search', showSubResults: false, placeholder: 'Search tools…', resetStyles: false });
+  };
+  document.head.appendChild(script);
+</script>
+
+<style>
+  #search {
+    --pagefind-ui-scale: 0.9; --pagefind-ui-primary: #2563eb;
+    --pagefind-ui-text: #111827; --pagefind-ui-background: #ffffff;
+    --pagefind-ui-border: #e5e7eb; --pagefind-ui-border-width: 1px;
+    --pagefind-ui-border-radius: 8px; --pagefind-ui-font: system-ui, sans-serif;
+  }
+</style>

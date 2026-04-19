@@ -1,0 +1,188 @@
+id: notion
+name: Notion
+description: 集文档、数据库、Wiki 于一体的协作工作空间，支持灵活的块式编辑。
+homepage: https://notion.so
+category: notes
+
+tools:
+  - id: notion-mcp
+    name: notion-mcp-server（官方）
+    type: mcp
+    install_cmd: "npx @notionhq/notion-mcp-server"
+    repo: https://github.com/makenotion/notion-mcp-server
+    maintained: official
+
+  - id: notion-cli
+    name: notion-cli（社区）
+    type: cli
+    install_cmd: "pip install notion-cli"
+    repo: https://github.com/ramnes/notion-sdk-py
+    maintained: community
+
+domains:
+  - id: pages
+    name: 页面管理
+    features:
+      - id: create-page
+        name: 创建页面
+        status: supported
+        tool_id: notion-mcp
+        command: "mcp call notion.pages.create parent='{\"database_id\":\"xxx\"}' properties='{\"Name\":{\"title\":[{\"text\":{\"content\":\"新页面\"}}]}}'"
+        input: |
+          parent: 父级（database_id 或 page_id）
+          properties: 页面属性（title 必填）
+        output: '{ "id": "page_xxx", "url": "https://notion.so/xxx" }'
+
+      - id: read-page
+        name: 读取页面内容
+        status: supported
+        tool_id: notion-mcp
+        command: "mcp call notion.blocks.children.list block_id=page_xxx"
+        output: |
+          {
+            "results": [
+              { "type": "paragraph", "paragraph": { "rich_text": [{ "plain_text": "正文内容" }] } }
+            ]
+          }
+        notes: "返回块列表，需递归读取嵌套块"
+
+      - id: append-blocks
+        name: 追加内容块
+        status: supported
+        tool_id: notion-mcp
+        command: "mcp call notion.blocks.children.append block_id=page_xxx children='[{\"paragraph\":{\"rich_text\":[{\"text\":{\"content\":\"新内容\"}}]}}]'"
+        output: '{ "results": [...] }'
+        notes: "支持 paragraph / heading / bulleted_list / code / image 等所有块类型"
+
+      - id: update-page-title
+        name: 修改页面标题
+        status: supported
+        tool_id: notion-mcp
+        command: "mcp call notion.pages.update page_id=page_xxx properties='{\"Name\":{\"title\":[{\"text\":{\"content\":\"新标题\"}}]}}'"
+        output: '{ "id": "page_xxx", "url": "https://notion.so/xxx" }'
+
+      - id: archive-page
+        name: 归档（删除）页面
+        status: supported
+        tool_id: notion-mcp
+        command: "mcp call notion.pages.update page_id=page_xxx archived=true"
+        output: '{ "id": "page_xxx", "archived": true }'
+        notes: "Notion 无永久删除 API，archived=true 相当于移入回收站"
+
+      - id: move-page
+        name: 移动页面到其他父级
+        status: unsupported
+        gap_reason: "Notion API 不支持修改页面的 parent，只能重新创建"
+
+  - id: database
+    name: 数据库
+    features:
+      - id: create-database
+        name: 创建数据库
+        status: supported
+        tool_id: notion-mcp
+        command: "mcp call notion.databases.create parent='{\"page_id\":\"page_xxx\"}' title='[{\"text\":{\"content\":\"项目追踪\"}}]' properties='{\"Name\":{\"title\":{}},\"状态\":{\"select\":{\"options\":[{\"name\":\"进行中\",\"color\":\"blue\"}]}}}'"
+        output: '{ "id": "db_xxx", "url": "https://notion.so/xxx" }'
+
+      - id: query-database
+        name: 查询数据库记录
+        status: supported
+        tool_id: notion-mcp
+        command: "mcp call notion.databases.query database_id=db_xxx filter='{\"property\":\"状态\",\"select\":{\"equals\":\"进行中\"}}' sorts='[{\"property\":\"Name\",\"direction\":\"ascending\"}]'"
+        input: |
+          database_id: 数据库 ID
+          filter: 过滤条件（支持 and/or 组合）
+          sorts: 排序规则
+        output: '{ "results": [...], "has_more": false }'
+
+      - id: add-database-row
+        name: 添加数据库行（创建页面）
+        status: supported
+        tool_id: notion-mcp
+        command: "mcp call notion.pages.create parent='{\"database_id\":\"db_xxx\"}' properties='{\"Name\":{\"title\":[{\"text\":{\"content\":\"Task A\"}}]},\"状态\":{\"select\":{\"name\":\"进行中\"}}}'"
+        output: '{ "id": "page_yyy", "url": "https://notion.so/yyy" }'
+
+      - id: update-database-row
+        name: 更新数据库行属性
+        status: supported
+        tool_id: notion-mcp
+        command: "mcp call notion.pages.update page_id=page_yyy properties='{\"状态\":{\"select\":{\"name\":\"已完成\"}}}'"
+        output: '{ "id": "page_yyy" }'
+
+      - id: get-database-schema
+        name: 获取数据库字段结构
+        status: supported
+        tool_id: notion-mcp
+        command: "mcp call notion.databases.retrieve database_id=db_xxx"
+        output: '{ "properties": { "Name": { "type": "title" }, "状态": { "type": "select", "select": { "options": [...] } } } }'
+
+      - id: rollup-formula
+        name: 创建汇总/公式字段
+        status: unsupported
+        gap_reason: "Rollup 和 Formula 字段只能通过 GUI 配置，API 不支持创建"
+
+  - id: search
+    name: 搜索
+    features:
+      - id: full-text-search
+        name: 全文搜索页面和数据库
+        status: supported
+        tool_id: notion-mcp
+        command: "mcp call notion.search query='OKR 2026' filter='{\"value\":\"page\",\"property\":\"object\"}'"
+        input: |
+          query: 搜索关键词
+          filter.value: "page" 或 "database"
+        output: |
+          {
+            "results": [
+              { "id": "page_xxx", "url": "https://notion.so/xxx", "properties": { "Name": {...} } }
+            ]
+          }
+
+      - id: search-databases-only
+        name: 只搜索数据库
+        status: supported
+        tool_id: notion-mcp
+        command: "mcp call notion.search query='项目' filter='{\"value\":\"database\",\"property\":\"object\"}'"
+        output: '{ "results": [...] }'
+
+      - id: filter-by-date
+        name: 按创建/修改时间过滤
+        status: partial
+        tool_id: notion-mcp
+        notes: "databases.query 支持 last_edited_time 过滤，search 接口不支持"
+        gap_reason: "search 接口无时间范围参数，只能在数据库查询时用"
+
+      - id: semantic-search
+        name: 语义搜索（AI 相关搜索）
+        status: unsupported
+        gap_reason: "Notion AI 搜索仅 GUI，API 未开放语义检索接口"
+
+  - id: comments
+    name: 评论
+    features:
+      - id: add-comment
+        name: 添加评论
+        status: supported
+        tool_id: notion-mcp
+        command: "mcp call notion.comments.create parent='{\"page_id\":\"page_xxx\"}' rich_text='[{\"text\":{\"content\":\"LGTM！\"}}]'"
+        output: '{ "id": "comment_xxx", "created_time": "..." }'
+
+      - id: list-comments
+        name: 获取页面评论列表
+        status: supported
+        tool_id: notion-mcp
+        command: "mcp call notion.comments.list block_id=page_xxx"
+        output: '{ "results": [{ "id": "comment_xxx", "rich_text": [...] }] }'
+
+      - id: reply-comment
+        name: 回复评论（在 discussion 线程）
+        status: supported
+        tool_id: notion-mcp
+        command: "mcp call notion.comments.create parent='{\"page_id\":\"page_xxx\"}' discussion_id=disc_xxx rich_text='[{\"text\":{\"content\":\"已修复\"}}]'"
+        output: '{ "id": "comment_yyy" }'
+
+      - id: resolve-comment
+        name: 标记评论为已解决
+        status: unsupported
+        gap_reason: "Notion API 暂不支持解决/关闭评论，仅 GUI 支持"

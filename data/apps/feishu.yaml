@@ -251,3 +251,130 @@ domains:
         name: 删除邮件
         status: unsupported
         gap_reason: "飞书邮件 API 暂不支持删除操作"
+
+  - id: approval
+    name: 审批
+    features:
+      - id: create-approval
+        name: 发起审批
+        status: supported
+        tool_id: lark-openapi-mcp
+        command: "mcp call approval.instance.create approval_code=xxx form='[{\"id\":\"widget1\",\"value\":\"请假3天\"}]'"
+        input: |
+          approval_code: 审批定义 code（管理员预先创建）
+          form: 表单字段 JSON 数组
+        output: '{ "instance_code": "aPxxxxx" }'
+        notes: "approval_code 可通过 approval.approval.list 获取"
+
+      - id: get-approval-status
+        name: 查询审批状态
+        status: supported
+        tool_id: lark-openapi-mcp
+        command: "mcp call approval.instance.get instance_id=aPxxxxx"
+        output: |
+          {
+            "instance_code": "aPxxxxx",
+            "status": "PENDING",
+            "form": [...],
+            "timeline": [...]
+          }
+
+      - id: approve-or-reject
+        name: 同意/拒绝审批
+        status: supported
+        tool_id: lark-openapi-mcp
+        command: "mcp call approval.instance.approve instance_id=aPxxxxx user_id=ou_xxx comment='同意'"
+        output: '{ "instance_code": "aPxxxxx" }'
+        notes: "拒绝时调用 approval.instance.reject，需要审批人身份"
+
+      - id: recall-approval
+        name: 撤回审批
+        status: supported
+        tool_id: lark-openapi-mcp
+        command: "mcp call approval.instance.cancel instance_id=aPxxxxx user_id=ou_xxx"
+        output: '{ "instance_code": "aPxxxxx" }'
+
+      - id: batch-query-approvals
+        name: 批量查询待办审批
+        status: partial
+        tool_id: lark-openapi-mcp
+        command: "mcp call approval.task.list user_id=ou_xxx page_size=20"
+        notes: "可获取当前用户所有待审批任务，但不支持跨部门批量操作"
+        gap_reason: "无法代他人查询审批列表，只能查自己"
+
+  - id: hr-leave
+    name: 人事 / 假期
+    features:
+      - id: query-leave-balance
+        name: 查询假期余额
+        status: supported
+        tool_id: lark-openapi-mcp
+        command: "mcp call attendance.leave_accrual_record.list user_id=ou_xxx leave_type_id=annual"
+        output: |
+          {
+            "accrual_records": [
+              { "leave_type": "年假", "balance": 8.5, "unit": "天" }
+            ]
+          }
+
+      - id: submit-leave
+        name: 提交请假申请
+        status: supported
+        tool_id: lark-openapi-mcp
+        command: "mcp call leave.user_daily_leave.apply leave_type_id=annual start_date=2026-05-01 end_date=2026-05-03 reason='个人事务'"
+        input: |
+          leave_type_id: 假期类型（annual/sick/personal...）
+          start_date / end_date: YYYY-MM-DD
+          reason: 请假事由
+        output: '{ "leave_request_id": "xxx", "status": "pending" }'
+
+      - id: query-leave-records
+        name: 查询自己的请假记录
+        status: supported
+        tool_id: lark-openapi-mcp
+        command: "mcp call leave.user_leave_record.list user_id=ou_xxx start_date=2026-01-01 end_date=2026-12-31"
+        output: '{ "records": [...] }'
+
+      - id: hr-onboarding
+        name: 发起入职流程
+        status: unsupported
+        gap_reason: "入职流程仅限 HR 管理界面操作，API 未开放"
+
+  - id: okr
+    name: OKR
+    features:
+      - id: create-okr
+        name: 创建 OKR
+        status: supported
+        tool_id: lark-openapi-mcp
+        command: "mcp call okr.okr.create period_id=xxx objective_content='提升 AI 功能覆盖率至 80%'"
+        input: |
+          period_id: OKR 周期 ID（季度/年）
+          objective_content: O 的描述文字
+        output: '{ "okr_id": "xxx", "objective_id": "yyy" }'
+
+      - id: add-key-result
+        name: 添加关键结果（KR）
+        status: supported
+        tool_id: lark-openapi-mcp
+        command: "mcp call okr.okr.objective.key_result.create okr_id=xxx objective_id=yyy content='发布 3 个新应用覆盖' score=0"
+        output: '{ "key_result_id": "zzz" }'
+
+      - id: update-okr-progress
+        name: 更新 OKR 进度
+        status: supported
+        tool_id: lark-openapi-mcp
+        command: "mcp call okr.okr.objective.key_result.patch okr_id=xxx key_result_id=zzz score=60 progress_rate='{\"percent\":60}'"
+        output: '{ "key_result_id": "zzz" }'
+
+      - id: list-team-okr
+        name: 查询团队 OKR 列表
+        status: supported
+        tool_id: lark-openapi-mcp
+        command: "mcp call okr.okr.list user_id_list='[\"ou_xxx\",\"ou_yyy\"]' period_id=xxx"
+        output: '{ "okr_list": [...] }'
+
+      - id: okr-alignment
+        name: 设置 OKR 对齐关系
+        status: unsupported
+        gap_reason: "OKR 对齐（父子关系）仅限 GUI 拖拽操作，API 未开放"
