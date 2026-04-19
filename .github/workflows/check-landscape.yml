@@ -1,0 +1,33 @@
+name: Update Landscape Freshness
+
+on:
+  schedule:
+    - cron: '0 2 * * 1'   # 每周一 UTC 02:00 自动运行
+  workflow_dispatch:        # 支持手动触发
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write       # 允许自动 commit
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Run landscape checker
+        run: npx tsx scripts/check-landscape.ts --write
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Auto-commit updated data
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: auto-update landscape MCP/CLI status [skip ci]"
+          file_pattern: data/landscape.yaml

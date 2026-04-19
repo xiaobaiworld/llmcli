@@ -1,0 +1,580 @@
+# 重要软件 CLI/MCP 全景图
+# 字段说明：
+#   mcp_type: official（官方维护）/ community（社区维护）/ none
+#   last_checked: 最后人工核实日期，check-landscape.ts 会自动更新
+- id: github
+  name: GitHub
+  company: GitHub (Microsoft)
+  category: devtools
+  website: https://github.com
+  has_mcp: true
+  mcp_type: official
+  mcp_url: https://github.com/github/github-mcp-server
+  has_cli: true
+  cli_name: gh
+  cli_url: https://cli.github.com
+  last_checked: 2026-04-19
+
+- id: gitlab
+  name: GitLab
+  company: GitLab
+  category: devtools
+  website: https://gitlab.com
+  has_mcp: true
+  mcp_type: official
+  mcp_url: https://docs.gitlab.com/user/gitlab_duo/model_context_protocol/mcp_server/
+  has_cli: true
+  cli_name: glab
+  cli_url: https://gitlab.com/gitlab-org/cli
+  last_checked: 2026-04-19
+
+- id: bitbucket
+  name: Bitbucket
+  company: Atlassian
+  category: devtools
+  website: https://bitbucket.org
+  has_mcp: true
+  mcp_type: community
+  mcp_url: https://github.com/MatanYemini/bitbucket-mcp
+  has_cli: false
+  last_checked: 2026-04-19
+
+- id: vercel
+  name: Vercel
+  company: Vercel
+  category: devtools
+  website: https://vercel.com
+  has_mcp: true
+  mcp_type: official
+  mcp_url: https://vercel.com/docs/agent-resources/vercel-mcp
+  has_cli: true
+  cli_name: vercel
+  cli_url: https://vercel.com/docs/cli
+  last_checked: 2026-04-19
+
+- id: netlify
+  name: Netlify
+  company: Netlify
+  category: devtools
+  website: https://netlify.com
+  has_mcp: true
+  mcp_type: official
+  mcp_url: https://docs.netlify.com/build/build-with-ai/netlify-mcp-server/
+  has_cli: true
+  cli_name: netlify
+  cli_url: https://docs.netlify.com/cli/get-started/
+  last_checked: 2026-04-19
+
+- id: supabase
+  name: Supabase
+  company: Supabase
+  category: devtools
+  website: https://supabase.com
+  has_mcp: true
+  mcp_type: community
+  mcp_url: https://github.com/supabase-community/supabase-mcp
+  has_cli: true
+  cli_name: supabase
+  cli_url: https://supabase.com/docs/reference/cli
+  last_checked: 2026-04-19
+
+- id: cloudflare
+  name: Cloudflare
+  company: Cloudflare
+  category: devtools
+  website: https://cloudflare.com
+  has_mcp: true
+  mcp_type: community
+  mcp_url: https://developers.cloudflare.com/workers/wrangler/
+  has_cli: true
+  cli_name: wrangler
+  cli_url: https://developers.cloudflare.com/workers/wrangler/
+  last_checked: 2026-04-19
+
+- id: linear
+  name: Linear
+  company: Linear
+  category: project
+  website: https://linear.app
+  has_mcp: true
+  mcp_type: official
+  mcp_url: https://linear.app/docs/mcp
+  has_cli: false
+  last_checked: 2026-04-19
+
+- id: jira
+  name: Jira
+  company: Atlassian
+  category: project
+  website: https://www.atlassian.com/software/jira
+  has_mcp: true
+  mcp_type: official
+  mcp_url: https://github.com/atlassian/atlassian-mcp-server
+  has_cli: false
+  last_checked: 2026-04-19
+
+- id: asana
+  name: Asana
+  company: Asana
+  category: project
+  website: https://asana.com
+  has_mcp: true
+  mcp_type: community
+  mcp_url: https://github.com/roychri/mcp-server-asana
+  has_cli: false
+  last_checked: 2026-04-19
+
+- id: trello
+  name: Trello
+  company: Atlassian
+  category: project
+  website: https://trello.com
+  has_mcp: true
+  mcp_type: community
+  mcp_url: https://www.pulsemcp.com/servers/trello
+  has_cli: false
+  last_checked: 2026-04-19
+
+- id: monday
+  name: Monday.com
+  company: Monday.com
+  category: project
+  website: https://monday.com
+  has_mcp: false
+  mcp_type: none
+  has_cli: false
+  last_checked: 2026-04-19
+
+- id: clickup
+  name: ClickUp
+  company: ClickUp
+  category: project
+  website: https://clickup.com
+  has_mcp: true
+  mcp_type: official
+  mcp_url: https://developer.clickup.com/docs/connect-an-ai-assistant-to-clickups-mcp-server
+  has_cli: false
+  last_checked: 2026-04-19
+
+- id: basecamp
+  name: Basecamp
+  company: 37signals
+  category: project
+  website: https://basecamp.com
+  has_mcp: true
+  mcp_type: community
+  mcp_url: https://github.com/Basecamp/bc3-api
+  has_cli: false
+  last_checked: 2026-04-19
+
+- id: slack
+  name: Slack
+  company: Salesforce
+  category: collab
+  website: https://slack.com
+  has_mcp: true
+  mcp_type: official
+  mcp_url: https://slack.com/help/articles/48855576908307
+  has_cli: true
+  cli_name: slack-cli
+  cli_url: https://api.slack.com/tools/cli
+  last_checked: 2026-04-19
+
+- id: teams
+  name: Microsoft Teams
+  company: Microsoft
+  category: collab
+  website: https://teams.microsoft.com
+  has_mcp: true
+  mcp_type: official
+  mcp_url: https://github.com/microsoft/teams-mcp
+  has_cli: false
+  last_checked: 2026-04-19
+
+- id: google-chat
+  name: Google Chat
+  company: Google
+  category: collab
+  website: https://chat.google.com
+  has_mcp: false
+  mcp_type: none
+  has_cli: false
+  last_checked: 2026-04-19
+
+- id: zoom
+  name: Zoom
+  company: Zoom
+  category: collab
+  website: https://zoom.us
+  has_mcp: false
+  mcp_type: none
+  has_cli: false
+  last_checked: 2026-04-19
+
+- id: discord
+  name: Discord
+  company: Discord
+  category: collab
+  website: https://discord.com
+  has_mcp: true
+  mcp_type: community
+  mcp_url: https://github.com/v-3/discordmcp
+  has_cli: false
+  last_checked: 2026-04-19
+
+- id: dingtalk
+  name: 钉钉
+  company: Alibaba
+  category: collab
+  website: https://www.dingtalk.com
+  has_mcp: true
+  mcp_type: official
+  mcp_url: https://github.com/open-dingtalk/dingtalk-agent-toolkit
+  has_cli: false
+  last_checked: 2026-04-19
+
+- id: feishu
+  name: 飞书 / Lark
+  company: ByteDance
+  category: collab
+  website: https://www.feishu.cn
+  has_mcp: true
+  mcp_type: official
+  mcp_url: https://github.com/larksuite/lark-openapi-mcp
+  has_cli: true
+  cli_name: larksuite-cli
+  cli_url: https://github.com/larksuite/cli
+  last_checked: 2026-04-19
+
+- id: wecom
+  name: 企业微信
+  company: Tencent
+  category: collab
+  website: https://work.weixin.qq.com
+  has_mcp: true
+  mcp_type: community
+  mcp_url: https://github.com/cnych/wecom-mcp
+  has_cli: true
+  cli_name: wecom-cli
+  cli_url: https://github.com/sbzhu/weworkapi_python
+  last_checked: 2026-04-19
+
+- id: notion
+  name: Notion
+  company: Notion Labs
+  category: productivity
+  website: https://notion.so
+  has_mcp: true
+  mcp_type: official
+  mcp_url: https://github.com/makenotion/notion-mcp-server
+  has_cli: true
+  cli_name: notion-cli
+  cli_url: https://github.com/ramnes/notion-sdk-py
+  last_checked: 2026-04-19
+
+- id: obsidian
+  name: Obsidian
+  company: Obsidian
+  category: productivity
+  website: https://obsidian.md
+  has_mcp: true
+  mcp_type: community
+  mcp_url: https://github.com/cyanheads/obsidian-mcp-server
+  has_cli: false
+  last_checked: 2026-04-19
+
+- id: confluence
+  name: Confluence
+  company: Atlassian
+  category: productivity
+  website: https://www.atlassian.com/software/confluence
+  has_mcp: true
+  mcp_type: official
+  mcp_url: https://github.com/atlassian/atlassian-mcp-server
+  has_cli: false
+  last_checked: 2026-04-19
+
+- id: airtable
+  name: Airtable
+  company: Airtable
+  category: productivity
+  website: https://airtable.com
+  has_mcp: true
+  mcp_type: official
+  mcp_url: https://support.airtable.com/docs/using-the-airtable-mcp-server
+  has_cli: false
+  last_checked: 2026-04-19
+
+- id: coda
+  name: Coda
+  company: Coda
+  category: productivity
+  website: https://coda.io
+  has_mcp: true
+  mcp_type: community
+  mcp_url: https://github.com/elberrd/coda-mcp
+  has_cli: false
+  last_checked: 2026-04-19
+
+- id: evernote
+  name: Evernote
+  company: Evernote
+  category: productivity
+  website: https://evernote.com
+  has_mcp: false
+  mcp_type: none
+  has_cli: false
+  last_checked: 2026-04-19
+
+- id: figma
+  name: Figma
+  company: Adobe
+  category: design
+  website: https://figma.com
+  has_mcp: true
+  mcp_type: official
+  mcp_url: https://help.figma.com/hc/en-us/articles/39216419318551
+  has_cli: true
+  cli_name: figma code-connect
+  cli_url: https://github.com/figma/code-connect
+  last_checked: 2026-04-19
+
+- id: sketch
+  name: Sketch
+  company: Sketch
+  category: design
+  website: https://sketch.com
+  has_mcp: true
+  mcp_type: official
+  mcp_url: https://www.sketch.com/docs/mcp-server/
+  has_cli: true
+  cli_name: sketchtool
+  cli_url: https://developer.sketch.com/cli/
+  last_checked: 2026-04-19
+
+- id: canva
+  name: Canva
+  company: Canva
+  category: design
+  website: https://canva.com
+  has_mcp: true
+  mcp_type: official
+  mcp_url: https://www.canva.dev/docs/apps/mcp-server/
+  has_cli: false
+  last_checked: 2026-04-19
+
+- id: miro
+  name: Miro
+  company: Miro
+  category: design
+  website: https://miro.com
+  has_mcp: true
+  mcp_type: official
+  mcp_url: https://developers.miro.com/docs/miro-mcp
+  has_cli: false
+  last_checked: 2026-04-19
+
+- id: snowflake
+  name: Snowflake
+  company: Snowflake
+  category: data
+  website: https://snowflake.com
+  has_mcp: false
+  mcp_type: none
+  has_cli: true
+  cli_name: snowsql
+  cli_url: https://docs.snowflake.com/en/user-guide/snowsql
+  last_checked: 2026-04-19
+
+- id: bigquery
+  name: BigQuery
+  company: Google
+  category: data
+  website: https://cloud.google.com/bigquery
+  has_mcp: true
+  mcp_type: community
+  mcp_url: https://github.com/ergut/mcp-bigquery-server
+  has_cli: true
+  cli_name: bq
+  cli_url: https://cloud.google.com/bigquery/docs/bq-command-line-tool
+  last_checked: 2026-04-19
+
+- id: dbt
+  name: dbt
+  company: dbt Labs
+  category: data
+  website: https://www.getdbt.com
+  has_mcp: true
+  mcp_type: official
+  mcp_url: https://docs.getdbt.com/docs/cloud/about-cloud-develop-defer
+  has_cli: true
+  cli_name: dbt
+  cli_url: https://docs.getdbt.com/reference/dbt-commands
+  last_checked: 2026-04-19
+
+- id: metabase
+  name: Metabase
+  company: Metabase
+  category: data
+  website: https://metabase.com
+  has_mcp: true
+  mcp_type: community
+  mcp_url: https://github.com/CPR43/metabase-mcp
+  has_cli: false
+  last_checked: 2026-04-19
+
+- id: grafana
+  name: Grafana
+  company: Grafana Labs
+  category: data
+  website: https://grafana.com
+  has_mcp: true
+  mcp_type: community
+  mcp_url: https://github.com/grafana/mcp-grafana
+  has_cli: true
+  cli_name: grafana-cli
+  cli_url: https://grafana.com/docs/grafana/latest/cli/
+  last_checked: 2026-04-19
+
+- id: datadog
+  name: Datadog
+  company: Datadog
+  category: data
+  website: https://datadoghq.com
+  has_mcp: true
+  mcp_type: official
+  mcp_url: https://docs.datadoghq.com/bits_ai/mcp_server/
+  has_cli: false
+  last_checked: 2026-04-19
+
+- id: salesforce
+  name: Salesforce
+  company: Salesforce
+  category: crm
+  website: https://salesforce.com
+  has_mcp: true
+  mcp_type: official
+  mcp_url: https://developer.salesforce.com/blogs/2025/06/introducing-mcp-support-across-salesforce
+  has_cli: true
+  cli_name: sf
+  cli_url: https://developer.salesforce.com/tools/salesforcecli
+  last_checked: 2026-04-19
+
+- id: hubspot
+  name: HubSpot
+  company: HubSpot
+  category: crm
+  website: https://hubspot.com
+  has_mcp: true
+  mcp_type: official
+  mcp_url: https://developers.hubspot.com/mcp
+  has_cli: false
+  last_checked: 2026-04-19
+
+- id: zendesk
+  name: Zendesk
+  company: Zendesk
+  category: crm
+  website: https://zendesk.com
+  has_mcp: true
+  mcp_type: community
+  mcp_url: https://github.com/reminia/zendesk-mcp
+  has_cli: true
+  cli_name: zcli
+  cli_url: https://developer.zendesk.com/documentation/apps/zendesk-app-tools/zcli/
+  last_checked: 2026-04-19
+
+- id: intercom
+  name: Intercom
+  company: Intercom
+  category: crm
+  website: https://intercom.com
+  has_mcp: false
+  mcp_type: none
+  has_cli: false
+  last_checked: 2026-04-19
+
+- id: pipedrive
+  name: Pipedrive
+  company: Pipedrive
+  category: crm
+  website: https://pipedrive.com
+  has_mcp: true
+  mcp_type: community
+  mcp_url: https://github.com/WillDent/pipedrive-mcp-server
+  has_cli: false
+  last_checked: 2026-04-19
+
+- id: stripe
+  name: Stripe
+  company: Stripe
+  category: payments
+  website: https://stripe.com
+  has_mcp: true
+  mcp_type: official
+  mcp_url: https://docs.stripe.com/mcp
+  has_cli: false
+  last_checked: 2026-04-19
+
+- id: twilio
+  name: Twilio
+  company: Twilio
+  category: payments
+  website: https://twilio.com
+  has_mcp: true
+  mcp_type: official
+  mcp_url: https://www.twilio.com/en-us/blog/developers/community/build-a-sendgrid-mcp-server-for-ai-email-workflows
+  has_cli: true
+  cli_name: twilio-cli
+  cli_url: https://www.twilio.com/docs/twilio-cli/quickstart
+  last_checked: 2026-04-19
+
+- id: sendgrid
+  name: SendGrid
+  company: Twilio
+  category: payments
+  website: https://sendgrid.com
+  has_mcp: true
+  mcp_type: community
+  mcp_url: https://github.com/Garoth/sendgrid-mcp
+  has_cli: false
+  last_checked: 2026-04-19
+
+- id: aws
+  name: AWS
+  company: Amazon
+  category: cloud
+  website: https://aws.amazon.com
+  has_mcp: true
+  mcp_type: official
+  mcp_url: https://awslabs.github.io/mcp/
+  has_cli: true
+  cli_name: aws-cli
+  cli_url: https://aws.amazon.com/cli/
+  last_checked: 2026-04-19
+
+- id: gcp
+  name: Google Cloud
+  company: Google
+  category: cloud
+  website: https://cloud.google.com
+  has_mcp: true
+  mcp_type: official
+  mcp_url: https://docs.cloud.google.com/mcp/supported-products
+  has_cli: true
+  cli_name: gcloud
+  cli_url: https://cloud.google.com/sdk/gcloud
+  last_checked: 2026-04-19
+
+- id: azure
+  name: Azure
+  company: Microsoft
+  category: cloud
+  website: https://azure.microsoft.com
+  has_mcp: true
+  mcp_type: official
+  mcp_url: https://github.com/Azure/azure-mcp
+  has_cli: true
+  cli_name: az
+  cli_url: https://learn.microsoft.com/en-us/cli/azure/
+  last_checked: 2026-04-19
