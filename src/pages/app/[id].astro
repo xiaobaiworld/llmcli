@@ -80,10 +80,22 @@ const gaps = app.domains.flatMap(d =>
             <p class="text-gray-500 mt-1 leading-relaxed">{app.description}</p>
           </div>
 
-          <!-- Coverage summary -->
-          <div class="text-right shrink-0 hidden sm:block">
-            <div class="text-3xl font-bold text-gray-900">{stats.coveragePercent}%</div>
-            <div class="text-xs text-gray-400 mt-0.5">CLI/MCP 覆盖率</div>
+          <!-- Coverage summary + Agent-ready score -->
+          <div class="text-right shrink-0 hidden sm:block space-y-2">
+            <div>
+              <div class="text-3xl font-bold text-gray-900">{stats.coveragePercent}%</div>
+              <div class="text-xs text-gray-400 mt-0.5">CLI/MCP 覆盖率</div>
+            </div>
+            {app.agent_ready_score !== undefined && (
+              <div>
+                <div class="flex items-center justify-end gap-0.5 mb-0.5">
+                  {[1,2,3,4,5].map(i => (
+                    <div class={`w-3.5 h-3.5 rounded-sm ${i <= app.agent_ready_score! ? 'bg-blue-500' : 'bg-gray-200'}`} />
+                  ))}
+                </div>
+                <div class="text-xs text-gray-400">Agent 就绪度 {app.agent_ready_score}/5</div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -115,6 +127,27 @@ const gaps = app.domains.flatMap(d =>
         <div class="flex flex-wrap gap-2">
           {app.tools.map(tool => <ToolBadge tool={tool} />)}
         </div>
+
+        <!-- Agent-ready score detail -->
+        {app.agent_ready_score !== undefined && app.agent_ready_reasons && (
+          <div class="mt-4 bg-blue-50 border border-blue-100 rounded-xl px-4 py-3">
+            <div class="flex items-center gap-2 mb-2">
+              <div class="flex gap-0.5">
+                {[1,2,3,4,5].map(i => (
+                  <div class={`w-3.5 h-3.5 rounded-sm ${i <= app.agent_ready_score! ? 'bg-blue-500' : 'bg-gray-200'}`} />
+                ))}
+              </div>
+              <span class="text-sm font-semibold text-blue-800">Agent 就绪度 {app.agent_ready_score}/5</span>
+            </div>
+            <ul class="space-y-1">
+              {app.agent_ready_reasons.map(r => (
+                <li class="text-xs text-blue-700 flex items-start gap-1.5">
+                  <span class="mt-0.5 shrink-0">·</span>{r}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </section>
 
       <!-- ── 区块 2：功能覆盖矩阵 ── -->

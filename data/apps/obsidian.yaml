@@ -3,6 +3,12 @@ name: Obsidian
 description: 本地优先的 Markdown 知识库，支持双向链接与插件生态。
 homepage: https://obsidian.md
 category: notes
+agent_ready_score: 2
+agent_ready_reasons:
+  - "MCP server 为社区维护，需先启用 Local REST API 插件"
+  - "无官方 CLI，所有操作依赖本地 HTTP 接口"
+  - "本地优先架构不适合云端 agent 部署场景"
+  - "适合本机运行的个人知识库助手"
 
 tools:
   - id: obsidian-mcp

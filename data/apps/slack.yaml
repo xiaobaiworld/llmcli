@@ -3,6 +3,12 @@ name: Slack
 description: 面向团队的频道制即时通讯平台，支持工作流自动化与丰富的应用集成生态。
 homepage: https://slack.com
 category: enterprise-collab
+agent_ready_score: 4
+agent_ready_reasons:
+  - "官方 MCP server 完整支持消息/频道/文件操作"
+  - "Slack CLI 面向 app 管理，agent 日常操作依赖 MCP"
+  - "官方维护，安全稳定"
+  - "缺少原生 CLI 端的 JSON 输出支持"
 
 tools:
   - id: slack-mcp

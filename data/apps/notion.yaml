@@ -3,6 +3,12 @@ name: Notion
 description: 集文档、数据库、Wiki 于一体的协作工作空间，支持灵活的块式编辑。
 homepage: https://notion.so
 category: notes
+agent_ready_score: 4
+agent_ready_reasons:
+  - "官方 MCP server 覆盖页面/数据库/Block 完整 CRUD"
+  - "notion-mcp 官方维护，配置简单"
+  - "社区 CLI 有限，复杂查询建议走 MCP"
+  - "API 速率限制需注意（3 req/s）"
 
 tools:
   - id: notion-mcp

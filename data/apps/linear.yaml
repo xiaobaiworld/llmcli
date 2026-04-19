@@ -3,6 +3,12 @@ name: Linear
 description: 面向工程团队的现代项目管理工具，以速度和简洁著称，原生支持 MCP。
 homepage: https://linear.app
 category: project
+agent_ready_score: 3
+agent_ready_reasons:
+  - "官方 MCP server，Issue/Project/Cycle CRUD 完整"
+  - "无独立 CLI，全依赖 MCP 接入"
+  - "GraphQL API 成熟，MCP 封装质量高"
+  - "适合 AI agent 做任务拆解和状态追踪"
 
 tools:
   - id: linear-mcp

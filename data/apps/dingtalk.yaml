@@ -3,6 +3,12 @@ name: 钉钉
 description: 阿里巴巴出品的企业数字化平台，覆盖沟通、协作、审批、低代码应用等。
 homepage: https://www.dingtalk.com
 category: enterprise-collab
+agent_ready_score: 3
+agent_ready_reasons:
+  - "官方 MCP server，消息/日历/审批基础操作可用"
+  - "dingtalk-stream SDK 偏向事件监听，非命令式 CLI"
+  - "部分高级功能（视频会议/低代码）尚未开放 MCP"
+  - "国内网络环境下稳定，企业级合规支持好"
 
 tools:
   - id: dingtalk-mcp

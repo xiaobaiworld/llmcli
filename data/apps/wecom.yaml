@@ -3,6 +3,12 @@ name: 企业微信
 description: 腾讯出品的企业通讯与协作平台，深度整合微信生态。
 homepage: https://work.weixin.qq.com
 category: enterprise-collab
+agent_ready_score: 2
+agent_ready_reasons:
+  - "MCP server 为社区维护，稳定性存疑"
+  - "wecom-cli 功能覆盖有限，部分操作需调用原始 API"
+  - "企业微信 API 需审核，接入门槛高"
+  - "官方暂无 CLI/MCP 计划"
 
 tools:
   - id: wecom-cli

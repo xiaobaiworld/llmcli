@@ -1,0 +1,177 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getApps } from '../lib/apps';
+
+const apps = getApps();
+
+// Collect all MCP tools across all apps
+const mcpEntries = apps.flatMap(app =>
+  app.tools
+    .filter(t => t.type === 'mcp' || t.type === 'mcp-remote')
+    .map(t => ({ app, tool: t }))
+);
+
+const officialCount = mcpEntries.filter(e => e.tool.maintained === 'official').length;
+const communityCount = mcpEntries.filter(e => e.tool.maintained === 'community').length;
+
+// Apps without any MCP tool
+const appsWithoutMcp = apps.filter(
+  app => !app.tools.some(t => t.type === 'mcp' || t.type === 'mcp-remote')
+);
+---
+
+<BaseLayout
+  title="MCP Server 追踪 — llmcli"
+  description="汇总所有应用的 MCP server 状态：哪些有官方 MCP，哪些靠社区维护，哪些还没有。"
+>
+  <div data-pagefind-body>
+
+    <!-- Breadcrumb -->
+    <div class="border-b border-gray-200 bg-gray-50">
+      <div class="max-w-5xl mx-auto px-4 py-3 text-sm text-gray-400">
+        <a href="/" class="hover:text-gray-700 transition-colors">首页</a>
+        <span class="mx-2">/</span>
+        <span class="text-gray-700">MCP Server 追踪</span>
+      </div>
+    </div>
+
+    <div class="max-w-5xl mx-auto px-4 py-8 space-y-10">
+
+      <!-- Header -->
+      <section>
+        <h1 class="text-2xl font-bold text-gray-900 mb-2">MCP Server 追踪</h1>
+        <p class="text-gray-500 leading-relaxed mb-6">
+          汇总 llmcli 收录的所有 MCP server。官方 = 应用官方团队维护；社区 = 第三方开发者维护。
+        </p>
+        <div class="flex flex-wrap gap-6 text-sm">
+          <span>共 <strong class="text-gray-900">{mcpEntries.length}</strong> 个 MCP server</span>
+          <span class="text-green-700">✓ <strong>{officialCount}</strong> 官方</span>
+          <span class="text-amber-700">⚡ <strong>{communityCount}</strong> 社区</span>
+          {appsWithoutMcp.length > 0 && (
+            <span class="text-gray-400">✗ <strong>{appsWithoutMcp.length}</strong> 个应用暂无 MCP</span>
+          )}
+        </div>
+      </section>
+
+      <!-- MCP server table -->
+      <section>
+        <h2 class="text-lg font-bold text-gray-900 mb-4">官方 MCP Server</h2>
+        <div class="border border-gray-200 rounded-xl overflow-hidden">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-gray-50 border-b border-gray-200 text-left">
+                <th class="px-4 py-2.5 font-semibold text-gray-700">应用</th>
+                <th class="px-4 py-2.5 font-semibold text-gray-700">MCP Server</th>
+                <th class="px-4 py-2.5 font-semibold text-gray-700 hidden sm:table-cell">安装</th>
+                <th class="px-4 py-2.5 font-semibold text-gray-700 hidden md:table-cell">维护方</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              {mcpEntries
+                .filter(e => e.tool.maintained === 'official')
+                .map(({ app, tool }) => (
+                  <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-4 py-3">
+                      <a href={`/app/${app.id}`} class="font-medium text-blue-600 hover:text-blue-800 transition-colors">
+                        {app.name}
+                      </a>
+                    </td>
+                    <td class="px-4 py-3">
+                      <div class="font-mono text-xs text-gray-800">{tool.name}</div>
+                      {tool.repo && (
+                        <a
+                          href={tool.repo}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="text-xs text-gray-400 hover:text-blue-600 transition-colors"
+                        >
+                          GitHub ↗
+                        </a>
+                      )}
+                    </td>
+                    <td class="px-4 py-3 hidden sm:table-cell">
+                      <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded font-mono text-gray-700 break-all">
+                        {tool.install_cmd}
+                      </code>
+                    </td>
+                    <td class="px-4 py-3 hidden md:table-cell">
+                      <span class="text-xs font-medium text-green-700 bg-green-50 px-2 py-0.5 rounded-full">官方</span>
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Community MCP -->
+      {communityCount > 0 && (
+        <section>
+          <h2 class="text-lg font-bold text-gray-900 mb-4">社区 MCP Server</h2>
+          <div class="border border-gray-200 rounded-xl overflow-hidden">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="bg-gray-50 border-b border-gray-200 text-left">
+                  <th class="px-4 py-2.5 font-semibold text-gray-700">应用</th>
+                  <th class="px-4 py-2.5 font-semibold text-gray-700">MCP Server</th>
+                  <th class="px-4 py-2.5 font-semibold text-gray-700 hidden sm:table-cell">安装</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100">
+                {mcpEntries
+                  .filter(e => e.tool.maintained === 'community')
+                  .map(({ app, tool }) => (
+                    <tr class="hover:bg-gray-50 transition-colors">
+                      <td class="px-4 py-3">
+                        <a href={`/app/${app.id}`} class="font-medium text-blue-600 hover:text-blue-800 transition-colors">
+                          {app.name}
+                        </a>
+                      </td>
+                      <td class="px-4 py-3">
+                        <div class="font-mono text-xs text-gray-800">{tool.name}</div>
+                        {tool.repo && (
+                          <a
+                            href={tool.repo}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="text-xs text-gray-400 hover:text-blue-600 transition-colors"
+                          >
+                            GitHub ↗
+                          </a>
+                        )}
+                      </td>
+                      <td class="px-4 py-3 hidden sm:table-cell">
+                        <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded font-mono text-gray-700 break-all">
+                          {tool.install_cmd}
+                        </code>
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+          <p class="text-xs text-gray-400 mt-2">社区维护项目可能更新不及时，使用前请确认 repo 最近活跃。</p>
+        </section>
+      )}
+
+      <!-- Apps without MCP -->
+      {appsWithoutMcp.length > 0 && (
+        <section>
+          <h2 class="text-lg font-bold text-gray-900 mb-3">暂无 MCP 的应用</h2>
+          <div class="flex flex-wrap gap-2">
+            {appsWithoutMcp.map(app => (
+              <a
+                href={`/app/${app.id}`}
+                class="text-sm px-3 py-1.5 border border-gray-200 rounded-lg text-gray-600 hover:border-gray-400 hover:text-gray-900 transition-all"
+              >
+                {app.name}
+              </a>
+            ))}
+          </div>
+          <p class="text-xs text-gray-400 mt-2">这些应用目前只能通过 CLI 操作，或使用 REST API 封装。</p>
+        </section>
+      )}
+
+    </div>
+  </div>
+</BaseLayout>

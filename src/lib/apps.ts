@@ -69,6 +69,10 @@ export interface App {
   description: string;
   homepage?: string;
   category: string;
+  /** Agent-ready score 0–5: how well this app supports non-interactive agent automation */
+  agent_ready_score?: number;
+  /** Human-readable reasons behind the agent_ready_score */
+  agent_ready_reasons?: string[];
   tools: AppTool[];
   domains: Domain[];
 }

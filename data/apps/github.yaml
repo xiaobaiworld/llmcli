@@ -3,6 +3,12 @@ name: GitHub
 description: 全球最大的代码托管与协作平台，覆盖 Issue、PR、Actions、Releases 等全研发生命周期。
 homepage: https://github.com
 category: devtools
+agent_ready_score: 5
+agent_ready_reasons:
+  - "gh CLI 原生支持 --json 输出，适合管道处理"
+  - "全非交互模式，exit code 规范，CI/脚本场景一流"
+  - "官方 MCP server（github-mcp-server）完整覆盖 Issue/PR/Actions"
+  - "官方维护，活跃更新"
 
 tools:
   - id: gh-cli

@@ -3,6 +3,12 @@ name: 飞书 / Lark
 description: 字节跳动出品的企业协作套件，覆盖 IM、文档、日历、会议等。
 homepage: https://www.feishu.cn
 category: enterprise-collab
+agent_ready_score: 5
+agent_ready_reasons:
+  - "larksuite-cli 支持 JSON 输出，全非交互模式"
+  - "lark-openapi-mcp 官方 MCP，覆盖消息/文档/日历等所有核心域"
+  - "官方维护，文档完整，命令示例丰富"
+  - "22 个 agent_skills，功能覆盖最广"
 
 tools:
   - id: larksuite-cli
