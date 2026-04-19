@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.4.0] — 2026-04-19 — Phase 4: 導航完善 + 新 App + SEO
+
+### 新增
+- `data/apps/dingtalk.yaml`：釘釘覆蓋矩陣（5 域，工具：dingtalk-mcp 官方）
+- `data/apps/slack.yaml`：Slack 覆蓋矩陣（4 域，工具：slack-mcp-server 官方）
+- `data/apps/linear.yaml`：Linear 覆蓋矩陣（4 域，工具：linear-mcp-server 官方）
+- `src/layouts/BaseLayout.astro`：nav 新增「應用手冊」/ 「CLI 工具」入口；OG meta 完整
+- `public/sitemap.xml`：更新至 60 URLs（新增 3 個 app 頁）
+
+### 構建結果
+- 60 個頁面，0 錯誤，Pagefind 索引 58 頁
+
 ## [0.3.0] — 2026-04-19 — Phase 3: 内容扩展 + 部署上线
 
 ### 新增
