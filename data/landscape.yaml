@@ -9,7 +9,7 @@
   has_cli: true
   cli_name: gh
   cli_url: https://cli.github.com
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
 - id: gitlab
   name: GitLab
   company: GitLab
@@ -21,7 +21,7 @@
   has_cli: true
   cli_name: glab
   cli_url: https://gitlab.com/gitlab-org/cli
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
 - id: bitbucket
   name: Bitbucket
   company: Atlassian
@@ -31,7 +31,7 @@
   mcp_type: community
   mcp_url: https://github.com/MatanYemini/bitbucket-mcp
   has_cli: false
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
 - id: vercel
   name: Vercel
   company: Vercel
@@ -43,7 +43,7 @@
   has_cli: true
   cli_name: vercel
   cli_url: https://vercel.com/docs/cli
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
 - id: netlify
   name: Netlify
   company: Netlify
@@ -55,7 +55,7 @@
   has_cli: true
   cli_name: netlify
   cli_url: https://docs.netlify.com/cli/get-started/
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
 - id: supabase
   name: Supabase
   company: Supabase
@@ -67,7 +67,7 @@
   has_cli: true
   cli_name: supabase
   cli_url: https://supabase.com/docs/reference/cli
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
 - id: cloudflare
   name: Cloudflare
   company: Cloudflare
@@ -79,7 +79,7 @@
   has_cli: true
   cli_name: wrangler
   cli_url: https://developers.cloudflare.com/workers/wrangler/
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
 - id: linear
   name: Linear
   company: Linear
@@ -89,7 +89,7 @@
   mcp_type: official
   mcp_url: https://linear.app/docs/mcp
   has_cli: false
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
 - id: jira
   name: Jira
   company: Atlassian
@@ -99,7 +99,7 @@
   mcp_type: official
   mcp_url: https://github.com/atlassian/atlassian-mcp-server
   has_cli: false
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
 - id: asana
   name: Asana
   company: Asana
@@ -109,7 +109,7 @@
   mcp_type: community
   mcp_url: https://github.com/roychri/mcp-server-asana
   has_cli: false
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
 - id: trello
   name: Trello
   company: Atlassian
@@ -119,7 +119,7 @@
   mcp_type: community
   mcp_url: https://www.pulsemcp.com/servers/trello
   has_cli: false
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
 - id: monday
   name: Monday.com
   company: Monday.com
@@ -138,7 +138,7 @@
   mcp_type: official
   mcp_url: https://developer.clickup.com/docs/connect-an-ai-assistant-to-clickups-mcp-server
   has_cli: false
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
 - id: basecamp
   name: Basecamp
   company: 37signals
@@ -148,7 +148,7 @@
   mcp_type: community
   mcp_url: https://github.com/Basecamp/bc3-api
   has_cli: false
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
 - id: slack
   name: Slack
   company: Salesforce
@@ -160,7 +160,7 @@
   has_cli: true
   cli_name: slack-cli
   cli_url: https://api.slack.com/tools/cli
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
 - id: teams
   name: Microsoft Teams
   company: Microsoft
@@ -170,7 +170,7 @@
   mcp_type: official
   mcp_url: https://github.com/microsoft/teams-mcp
   has_cli: false
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
 - id: google-chat
   name: Google Chat
   company: Google
@@ -179,7 +179,7 @@
   has_mcp: true
   mcp_type: community
   has_cli: false
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
   mcp_url: https://www.npmjs.com/package/@arvoretech/google-chat-mcp
 - id: zoom
   name: Zoom
@@ -189,7 +189,7 @@
   has_mcp: true
   mcp_type: community
   has_cli: false
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
   mcp_url: https://www.npmjs.com/package/@kindflow/zoom-mcp-server
 - id: discord
   name: Discord
@@ -200,7 +200,7 @@
   mcp_type: community
   mcp_url: https://github.com/v-3/discordmcp
   has_cli: false
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
 - id: dingtalk
   name: 钉钉
   company: Alibaba
@@ -210,7 +210,7 @@
   mcp_type: official
   mcp_url: https://github.com/open-dingtalk/dingtalk-agent-toolkit
   has_cli: false
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
 - id: feishu
   name: 飞书 / Lark
   company: ByteDance
@@ -222,7 +222,7 @@
   has_cli: true
   cli_name: larksuite-cli
   cli_url: https://github.com/larksuite/cli
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
 - id: wecom
   name: 企业微信
   company: Tencent
@@ -234,7 +234,7 @@
   has_cli: true
   cli_name: wecom-cli
   cli_url: https://github.com/sbzhu/weworkapi_python
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
 - id: notion
   name: Notion
   company: Notion Labs
@@ -246,7 +246,7 @@
   has_cli: true
   cli_name: notion-cli
   cli_url: https://github.com/ramnes/notion-sdk-py
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
 - id: obsidian
   name: Obsidian
   company: Obsidian
@@ -256,7 +256,7 @@
   mcp_type: community
   mcp_url: https://github.com/cyanheads/obsidian-mcp-server
   has_cli: false
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
 - id: confluence
   name: Confluence
   company: Atlassian
@@ -266,7 +266,7 @@
   mcp_type: official
   mcp_url: https://github.com/atlassian/atlassian-mcp-server
   has_cli: false
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
 - id: airtable
   name: Airtable
   company: Airtable
@@ -276,7 +276,7 @@
   mcp_type: official
   mcp_url: https://support.airtable.com/docs/using-the-airtable-mcp-server
   has_cli: false
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
 - id: coda
   name: Coda
   company: Coda
@@ -286,7 +286,7 @@
   mcp_type: community
   mcp_url: https://github.com/elberrd/coda-mcp
   has_cli: false
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
 - id: evernote
   name: Evernote
   company: Evernote
@@ -295,7 +295,7 @@
   has_mcp: true
   mcp_type: community
   has_cli: false
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
   mcp_url: https://www.npmjs.com/package/@vineethnkrishnan/evernote-mcp
 - id: figma
   name: Figma
@@ -308,7 +308,7 @@
   has_cli: true
   cli_name: figma code-connect
   cli_url: https://github.com/figma/code-connect
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
 - id: sketch
   name: Sketch
   company: Sketch
@@ -320,7 +320,7 @@
   has_cli: true
   cli_name: sketchtool
   cli_url: https://developer.sketch.com/cli/
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
 - id: canva
   name: Canva
   company: Canva
@@ -330,7 +330,7 @@
   mcp_type: official
   mcp_url: https://www.canva.dev/docs/apps/mcp-server/
   has_cli: false
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
 - id: miro
   name: Miro
   company: Miro
@@ -340,7 +340,7 @@
   mcp_type: official
   mcp_url: https://developers.miro.com/docs/miro-mcp
   has_cli: false
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
 - id: snowflake
   name: Snowflake
   company: Snowflake
@@ -351,7 +351,7 @@
   has_cli: true
   cli_name: snowsql
   cli_url: https://docs.snowflake.com/en/user-guide/snowsql
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
   mcp_url: https://www.npmjs.com/package/snowflake-mcp
 - id: bigquery
   name: BigQuery
@@ -364,7 +364,7 @@
   has_cli: true
   cli_name: bq
   cli_url: https://cloud.google.com/bigquery/docs/bq-command-line-tool
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
 - id: dbt
   name: dbt
   company: dbt Labs
@@ -376,7 +376,7 @@
   has_cli: true
   cli_name: dbt
   cli_url: https://docs.getdbt.com/reference/dbt-commands
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
 - id: metabase
   name: Metabase
   company: Metabase
@@ -386,7 +386,7 @@
   mcp_type: community
   mcp_url: https://github.com/CPR43/metabase-mcp
   has_cli: false
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
 - id: grafana
   name: Grafana
   company: Grafana Labs
@@ -398,7 +398,7 @@
   has_cli: true
   cli_name: grafana-cli
   cli_url: https://grafana.com/docs/grafana/latest/cli/
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
 - id: datadog
   name: Datadog
   company: Datadog
@@ -408,7 +408,7 @@
   mcp_type: official
   mcp_url: https://docs.datadoghq.com/bits_ai/mcp_server/
   has_cli: false
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
 - id: salesforce
   name: Salesforce
   company: Salesforce
@@ -420,7 +420,7 @@
   has_cli: true
   cli_name: sf
   cli_url: https://developer.salesforce.com/tools/salesforcecli
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
 - id: hubspot
   name: HubSpot
   company: HubSpot
@@ -430,7 +430,7 @@
   mcp_type: official
   mcp_url: https://developers.hubspot.com/mcp
   has_cli: false
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
 - id: zendesk
   name: Zendesk
   company: Zendesk
@@ -442,7 +442,7 @@
   has_cli: true
   cli_name: zcli
   cli_url: https://developer.zendesk.com/documentation/apps/zendesk-app-tools/zcli/
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
 - id: intercom
   name: Intercom
   company: Intercom
@@ -451,7 +451,7 @@
   has_mcp: true
   mcp_type: community
   has_cli: false
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
   mcp_url: https://www.npmjs.com/package/@iflow-mcp/kaosensei-intercom-mcp
 - id: pipedrive
   name: Pipedrive
@@ -462,7 +462,7 @@
   mcp_type: community
   mcp_url: https://github.com/WillDent/pipedrive-mcp-server
   has_cli: false
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
 - id: stripe
   name: Stripe
   company: Stripe
@@ -472,7 +472,7 @@
   mcp_type: official
   mcp_url: https://docs.stripe.com/mcp
   has_cli: false
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
 - id: twilio
   name: Twilio
   company: Twilio
@@ -484,7 +484,7 @@
   has_cli: true
   cli_name: twilio-cli
   cli_url: https://www.twilio.com/docs/twilio-cli/quickstart
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
 - id: sendgrid
   name: SendGrid
   company: Twilio
@@ -494,7 +494,7 @@
   mcp_type: community
   mcp_url: https://github.com/Garoth/sendgrid-mcp
   has_cli: false
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
 - id: aws
   name: AWS
   company: Amazon
@@ -506,7 +506,7 @@
   has_cli: true
   cli_name: aws-cli
   cli_url: https://aws.amazon.com/cli/
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
 - id: gcp
   name: Google Cloud
   company: Google
@@ -518,7 +518,7 @@
   has_cli: true
   cli_name: gcloud
   cli_url: https://cloud.google.com/sdk/gcloud
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
 - id: azure
   name: Azure
   company: Microsoft
@@ -530,4 +530,4 @@
   has_cli: true
   cli_name: az
   cli_url: https://learn.microsoft.com/en-us/cli/azure/
-  last_checked: "2026-04-20"
+  last_checked: "2026-04-27"
